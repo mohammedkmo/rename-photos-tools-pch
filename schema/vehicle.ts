@@ -20,6 +20,9 @@ export const vehicleSchema = z.object({
       .min(1, "Contract Holding PetroChina Department is required"),
     eaLetterNumber: z.string().min(1, "EA Letter Number is required"),
     numberInEaList: z.string().min(1, "Number in EA List is required"),
+    securityClearanceExpiryDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Security clearance expiry date is required"),
     photo: z
       .instanceof(File)
       .refine((file) => file.size <= 10000000, `Max file size is 10MB.`),

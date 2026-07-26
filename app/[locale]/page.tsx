@@ -3,11 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 export default function HomePage() {
-  const { toast } = useToast();
   const t = useTranslations("common");
 
   const containerVariants = {
@@ -48,7 +46,7 @@ export default function HomePage() {
           <p className="text-sm text-slate-500">{t("whatLookingFor")}</p>
         </motion.div>
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
           variants={containerVariants}
         >
           <motion.div variants={itemVariants}>
@@ -89,30 +87,6 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <div
-              className="group relative overflow-hidden h-80 w-60 bg-gray-100 border text-gray-500 hover:bg-red-200 border-gray-200 hover:border-gray-300 rounded-xl p-4 flex flex-col gap-2 items-center justify-center text-center transition-all duration-300 hover:scale-105"
-              onClick={() =>
-                toast({
-                  title: t("comingSoon"),
-                  description: t("comingSoonDescription"),
-                  variant: "default",
-                })
-              }
-            >
-              <Image
-                className="absolute top-10 left-0 -translate-x-10 translate-y-10 transition-all duration-300 group-hover:left-16"
-                src="/temp.png"
-                alt="Temporary Badges"
-                width={180}
-                height={180}
-              />
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-gray-500 to-transparent to-70% transition-opacity duration-300 group-hover:opacity-75"></div>
-              <h1 className="text-lg font-bold z-10 absolute bottom-5 text-white transition-all duration-300 group-hover:scale-110">
-                {t("applyingForTemporaryBadges")}
-              </h1>
-            </div>
-          </motion.div>
         </motion.div>
       </motion.div>
     </motion.main>

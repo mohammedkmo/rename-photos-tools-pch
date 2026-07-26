@@ -13,12 +13,16 @@ interface CustomFileUploadProps {
   acceptedFileTypes?: string[];
 }
 
+// Kept outside the component so its identity is stable across renders,
+// otherwise the preview is regenerated on every keystroke in the form.
+const DEFAULT_ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "image/gif"];
+
 const CustomFileUpload: React.FC<CustomFileUploadProps> = ({
   onChange,
   label,
   initialFile,
-  maxSizeMB = 5,
-  acceptedFileTypes = ["image/jpeg", "image/png", "image/gif"],
+  maxSizeMB = 10,
+  acceptedFileTypes = DEFAULT_ACCEPTED_FILE_TYPES,
 }) => {
   const [fileName, setFileName] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -134,6 +138,7 @@ const CustomFileUpload: React.FC<CustomFileUploadProps> = ({
             </div>
             <div className="flex items-center justify-center gap-x-2 absolute top-2 right-2">
               <button
+                type="button"
                 onClick={handleDelete}
                 className="flex items-center justify-center px-2 p-1.5 bg-red-500/40 backdrop-blur-md rounded-full hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                 aria-label="Remove image"

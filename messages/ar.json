@@ -4,7 +4,6 @@
     "whatLookingFor": "ما الذي تبحث عنه؟",
     "applyingForPersonalBadges": "التقدم للحصول على باجات شخصية",
     "applyingForVehicleBadges": "التقدم للحصول على باجات المركبات",
-    "applyingForTemporaryBadges": "التقدم للحصول على باجات مؤقتة",
     "downloadExcelRegister": "تحميل سجل Excel",
     "renamePhotosNow": "إعادة تسمية صورك الآن",
     "byPCHBadgingTeam": "@بواسطة فريق باجات PCH",
@@ -13,13 +12,22 @@
     "emailAddress": "contractor-badging@petrochina-hfy.com",
     "renamePhotosTool": "أداة إعادة تسمية الصور",
     "home": "الرئيسية",
-    "comingSoon": "قريباً",
-    "comingSoonDescription": "الميزة ستصبح متاحة قريباً",
     "mobileNotSupported": "الهاتف غير مدعوم",
     "pleaseUseComputer": "يرجى استخدام الكمبيوتر للوصول إلى هذا التطبيق.",
     "personalBadges": "باجات شخصية",
     "vehicleBadges": "باجات المركبات",
-    "tempBadges": "باجات مؤقتة"
+    "continueAnyway": "المتابعة على أي حال",
+    "draftFound": "لديك عمل غير محفوظ من {when}.",
+    "draftPhotosNotIncluded": "لا يتم حفظ الصور والمستندات وستحتاج إلى رفعها مرة أخرى.",
+    "draftRestore": "استعادة",
+    "draftDiscard": "تجاهل",
+    "draftRestored": "تمت استعادة المسودة",
+    "draftRestoredDescription": "تمت استعادة البيانات النصية. يرجى رفع الصور والمستندات مرة أخرى.",
+    "fixErrors": "بعض البيانات ناقصة",
+    "fixErrorsDescription": "راجع علامات التبويب المميزة واملأ الحقول المطلوبة.",
+    "generating": "جاري إنشاء الملف...",
+    "copiedFromPrevious": "تم نسخ بيانات الشركة من الإدخال السابق",
+    "willBeWrittenAs": "سيتم كتابته هكذا"
   },
   "header": {
     "home": "الرئيسية"
@@ -85,8 +93,10 @@
         "atLeastOneEmployeeRequired": "يجب عليك إضافة على الأقل موظف واحد",
         "photoRequired": "صورة الموظف مطلوبة",
         "idDocumentRequired": "وثيقة هوية الموظف مطلوبة",
-        "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً"
-      }
+        "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً",
+        "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب"
+      },
+      "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
   },
   "vehiclesBadge": {
@@ -134,7 +144,7 @@
       "createZIPFailedDescription": "فشل انشاء ملف ZIP",
       "generateZIP": "إنشاء ZIP",
       "noHFYCNumberAddedYet": "لم يتم إضافة رقم HFYC بعد",
-      "enterHFYCNumber" : "اكتب رقم HFYC واضغط Enter (مثال: HFYC0001)",
+      "enterHFYCNumber": "اكتب رقم HFYC واضغط Enter (مثال: HFYC0001)",
       "softskinArmored": "نوع المركبة",
       "wakalaNumber": "رقم الوكالة",
       "armored": "مركبة مدرعة",
@@ -153,7 +163,8 @@
         "photoRequired": "صورة المركبة مطلوبة",
         "senewiyahRequired": "وثيقة السنوية مطلوبة",
         "maxFileSize": "الحد الأقصى لحجم الملف هو 10 ميجابايت"
-      }
+      },
+      "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
   },
   "renamePhotos": {
@@ -178,7 +189,7 @@
       "excelFileHint": "قم بتحميل ملف Excel يحتوي على أعمدة رقم HFYC والاسم الأول واسم العائلة. يرجى قراءة التعليمات التالية",
       "here": "هنا"
     },
-    "buttons":{
+    "buttons": {
       "generateZIP": "إنشاء ZIP"
     }
   },
@@ -202,7 +213,8 @@
       "enterAssociatedPetroChinaContractNumber": "أدخل رقم عقد بتروتشاينا المرتبط",
       "enterContractHoldingPetroChinaDepartment": "أدخل قسم بتروتشاينا الحامل للعقد",
       "enterEaLetterNumber": "أدخل رقم خطاب EA",
-      "enterNumberInEaList": "أدخل الرقم في قائمة EA"
+      "enterNumberInEaList": "أدخل الرقم في قائمة EA",
+      "enterSecurityClearanceExpiryDate": "اختر تاريخ انتهاء الموافقة الأمنية للموظف"
     },
     "vehicle": {
       "enterPlateNumber": "أدخل رقم اللوحة",
@@ -224,7 +236,8 @@
       "enterAssociatedPetroChinaContractNumber": "أدخل رقم عقد بتروتشاينا المرتبط",
       "enterContractHoldingPetroChinaDepartment": "أدخل قسم بتروتشاينا الحامل للعقد",
       "enterEaLetterNumber": "أدخل رقم خطاب EA",
-      "enterNumberInEaList": "أدخل الرقم في قائمة EA"
+      "enterNumberInEaList": "أدخل الرقم في قائمة EA",
+      "enterSecurityClearanceExpiryDate": "اختر تاريخ انتهاء الموافقة الأمنية للمركبة"
     },
     "company": {
       "enterContractor": "أدخل اسم المقاول",
@@ -264,30 +277,5 @@
     "eaLetterNumber": "رقم خطاب التصريح الأمني",
     "fleetNumber": "رقم المركبة للمركبة (إن وجد)",
     "chassisNumber": "رقم الهيكل الفريد للمركبة"
-  },
-  "temporaryBadge": {
-    "title": "طلب باج مؤقت",
-    "description": "يرجى ملء تفاصيل الموظف وتحميل المستندات المطلوبة. هذه العملية تتم بالكامل على جانب العميل، مما يضمن عدم تخزين أي بيانات على خادمنا. بمجرد الانتهاء، قم بتنزيل ملف ZIP وإرساله، مع التصريح الأمني اللازم، إلى مكتب باجات PCH على عنوان البريد الإلكتروني المقدم. شكرًا لتعاونكم.",
-    "form": {
-      "name": "اسم الموظف",
-      "companyName": "اسم الشركة",
-      "scNumber": "رقم SC",
-      "photo": "الصورة",
-      "uploadPhoto": "تحميل الصورة",
-      "employee": "الموظف",
-      "addEmployee": "إضافة موظف",
-      "generateBadges": "إنشاء باجات",
-      "allFieldsRequired": "جميع الحقول مطلوبة",
-      "createZIPSuccess": "تم إنشاء ملف ZIP بنجاح",
-      "createZIPFailed": "فشل إنشاء ملف ZIP",
-      "createZIPFailedDescription": "فشل إنشاء ملف ZIP",
-      "validation": {
-        "nameRequired": "اسم الموظف مطلوب",
-        "companyNameRequired": "اسم الشركة مطلوب",
-        "scNumberRequired": "رقم SC مطلوب",
-        "photoRequired": "الصورة مطلوبة",
-        "maxFileSize": "حجم الملف أقصى 10MB"
-      }
-    }
   }
 }

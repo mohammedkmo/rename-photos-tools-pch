@@ -2,9 +2,8 @@
   "common": {
     "appName": "PCH Badging Tools",
     "whatLookingFor": "What are you looking for?",
-    "applyingForPersonalBadges": "Applying for Personal Badges", 
+    "applyingForPersonalBadges": "Applying for Personal Badges",
     "applyingForVehicleBadges": "Applying for Vehicle Badges",
-    "applyingForTemporaryBadges": "Applying for Temporary Badges",
     "downloadExcelRegister": "Download the Excel register",
     "renamePhotosNow": "Rename your photos now",
     "byPCHBadgingTeam": "@By PCH Badging Team",
@@ -13,13 +12,22 @@
     "emailAddress": "contractor-badging@petrochina-hfy.com",
     "renamePhotosTool": "Rename photos tool",
     "home": "Home",
-    "comingSoon": "Coming Soon",
-    "comingSoonDescription": "This feature is coming soon",
     "mobileNotSupported": "Mobile Not Supported",
     "pleaseUseComputer": "Please use a computer to access this application.",
     "personalBadges": "Personal Badges",
     "vehicleBadges": "Vehicles Badges",
-    "tempBadges": "Temporary Badges"
+    "continueAnyway": "Continue anyway",
+    "draftFound": "You have unsaved work from {when}.",
+    "draftPhotosNotIncluded": "Photos and documents are not saved and will need to be uploaded again.",
+    "draftRestore": "Restore",
+    "draftDiscard": "Discard",
+    "draftRestored": "Draft restored",
+    "draftRestoredDescription": "Your text entries are back. Please upload the photos and documents again.",
+    "fixErrors": "Some details are missing",
+    "fixErrorsDescription": "Check the highlighted tabs and fill in the required fields.",
+    "generating": "Generating ZIP...",
+    "copiedFromPrevious": "Company details copied from the previous entry",
+    "willBeWrittenAs": "Will be written as"
   },
   "header": {
     "home": "Home"
@@ -66,7 +74,6 @@
       "createZIPSuccessDescription": "ZIP file created successfully",
       "createZIPFailed": "Failed",
       "createZIPFailedDescription": "Failed to create the ZIP file",
-
       "validation": {
         "badgeNumberRequired": "Badge number is required",
         "firstNameMinLength": "First name must be at least 2 characters",
@@ -84,8 +91,10 @@
         "photoRequired": "Photo is required",
         "idDocumentRequired": "ID Document is required",
         "drivingLicenseRequired": "Driving License is required",
-        "moiCardRequired": "MOI Card is required"
-      }
+        "moiCardRequired": "MOI Card is required",
+        "securityClearanceExpiryDateRequired": "Security clearance expiry date is required"
+      },
+      "securityClearanceExpiryDate": "Security Clearance Expiry Date"
     }
   },
   "vehiclesBadge": {
@@ -94,7 +103,7 @@
     "form": {
       "plateNumber": "Plate Number",
       "make": "Make",
-      "model": "Model", 
+      "model": "Model",
       "contractor": "Contractor",
       "province": "Province",
       "senewiyahNumber": "Senewiyah Number",
@@ -106,7 +115,7 @@
       "numberInEaList": "Number in EA List",
       "photo": "Photo",
       "senewiyah": "Senewiyah",
-      "wakala": "Wekala", 
+      "wakala": "Wekala",
       "armoredVehicleCertificate": "Armored Vehicle Certificate",
       "vehicle": "Vehicle",
       "details": "Details",
@@ -127,7 +136,7 @@
       "noValidDataFound": "No valid data found",
       "failedToProcessZipFile": "Failed to process the ZIP file",
       "pleaseUploadZipFile": "Please upload a ZIP file",
-      "createZIPSuccess": "Success", 
+      "createZIPSuccess": "Success",
       "createZIPSuccessDescription": "ZIP file created successfully",
       "createZIPFailed": "Failed",
       "createZIPFailedDescription": "Failed to create the ZIP file",
@@ -152,7 +161,8 @@
         "photoRequired": "Vehicle photo is required",
         "senewiyahRequired": "Senewiyah document is required",
         "maxFileSize": "Max file size is 10MB"
-      }
+      },
+      "securityClearanceExpiryDate": "Security Clearance Expiry Date"
     }
   },
   "renamePhotos": {
@@ -210,7 +220,8 @@
       "enterAssociatedPetroChinaContractNumber": "Enter the associated PetroChina contract number",
       "enterContractHoldingPetroChinaDepartment": "Enter the contract holding PetroChina department",
       "enterEaLetterNumber": "Enter the EA Letter Number",
-      "enterNumberInEaList": "Enter the Number in EA List"
+      "enterNumberInEaList": "Enter the Number in EA List",
+      "enterSecurityClearanceExpiryDate": "Select the expiry date of the employee's security clearance"
     },
     "vehicle": {
       "enterPlateNumber": "Enter the plate number",
@@ -226,13 +237,14 @@
       "uploadSenewiyah": "Upload the Senewiyah document",
       "uploadWakala": "Upload the Wakala document if applicable",
       "uploadArmoredVehicleCertificate": "Upload the Armored Vehicle Certificate if applicable",
-      "enterContractor":"Enter the contractor name",
+      "enterContractor": "Enter the contractor name",
       "enterCompanyName": "Enter the company name",
       "enterSubcontractor": "Enter the subContractor name if applicable",
       "enterAssociatedPetroChinaContractNumber": "Enter the associated PetroChina contract number",
       "enterContractHoldingPetroChinaDepartment": "Enter the contract holding PetroChina department",
       "enterEaLetterNumber": "Enter the EA Letter Number",
-      "enterNumberInEaList": "Enter the Number in EA List"
+      "enterNumberInEaList": "Enter the Number in EA List",
+      "enterSecurityClearanceExpiryDate": "Select the expiry date of the vehicle's security clearance"
     },
     "company": {
       "enterContractor": "Enter the contractor name",
@@ -272,30 +284,5 @@
     "eaLetterNumber": "Security clearance letter number",
     "fleetNumber": "Fleet number for the vehicle (if applicable)",
     "chassisNumber": "Unique chassis number of the vehicle"
-  },
-  "temporaryBadge": {
-    "title": "Apply for Temporary Badges",
-    "description": "Generate temporary badges for your employees. The badges will expire at the end of the current month.",
-    "form": {
-        "name": "Employee Name",
-        "companyName": "Company Name",
-        "scNumber": "SC Number",
-        "photo": "Photo",
-        "uploadPhoto": "Upload Photo",
-        "employee": "Employee",
-        "addEmployee": "Add Employee",
-        "generateBadges": "Generate Badges",
-        "allFieldsRequired": "All fields are required",
-        "createZIPSuccess": "Success",
-        "createZIPSuccessDescription": "Temporary badges generated successfully",
-        "createZIPFailed": "Error",
-        "createZIPFailedDescription": "Failed to generate temporary badges",
-        "validation": {
-            "nameRequired": "Employee name is required",
-            "companyNameRequired": "Company name is required",
-            "scNumberRequired": "SC number is required",
-            "maxFileSize": "Maximum file size is 10MB"
-        }
-    }
   }
 }
