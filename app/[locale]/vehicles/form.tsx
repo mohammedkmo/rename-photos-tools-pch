@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, type FieldErrors } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -23,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { FileArchive, Trash2, Upload, X } from "lucide-react";
+import { AlertCircle, FileArchive, Loader2, RotateCcw, Trash2, Upload, X } from "lucide-react";
 import { FormValues, formSchema } from "@/schema/vehicle";
 import {
   Select,
@@ -36,7 +36,9 @@ import CustomFileUpload from "@/components/ui/customFileUpload";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from "xlsx-js-style";
-import { formatDate, formatExpiryDate, parseExpiryDate } from "@/lib/helpers";
+import { formatDate, formatExpiryDate, intlLocale, parseExpiryDate } from "@/lib/helpers";
+import { toJpeg } from "@/lib/images";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -48,18 +50,46 @@ import {
 import { provinces } from "@/data/provinces";
 import { motion } from "framer-motion";
 
+const DRAFT_KEY = "hfyc:draft:vehicles";
+
+const EMPTY_VEHICLE = {
+  plateNumber: "",
+  make: "",
+  model: "",
+  province: "",
+  contractor: "",
+  senewiyahNumber: "",
+  wakalaNumber: "",
+  softskinArmored: "",
+  relatedPersons: [] as string[],
+  subcontractor: "",
+  associatedPetroChinaContractNumber: "",
+  contractHoldingPetroChinaDepartment: "",
+  eaLetterNumber: "",
+  numberInEaList: "",
+  securityClearanceExpiryDate: "",
+  photo: null as unknown as File,
+  senewiyah: null as unknown as File,
+  wakala: undefined,
+  armoredVehicleCertificate: undefined,
+};
+
 export default function VehiclesBadgeForm() {
   const locale = useLocale();
   const isRTL = locale === "ar";
   const formTranslations = useTranslations("vehiclesBadge.form");
   const formDescriptions = useTranslations("formDescriptions.vehicle");
   const companyDescriptions = useTranslations("formDescriptions.company");
+  const commonTranslations = useTranslations("common");
 
   const [activeTab, setActiveTab] = useState("vehicle-0");
   const form = useForm<FormValues>({
+    // Report problems as each field is left rather than saving them all up
+    // for the moment the user hits submit.
+    mode: "onTouched",
     resolver: zodResolver(formSchema),
     defaultValues: {
-      vehicles: [{}],
+      vehicles: [EMPTY_VEHICLE],
     },
   });
 
@@ -68,31 +98,49 @@ export default function VehiclesBadgeForm() {
     control: form.control,
   });
 
+  // Drives the tab labels so they follow the plate numbers as they are typed.
+  const watchedVehicles = useWatch({ control: form.control, name: "vehicles" });
+  const { errors, isSubmitting } = form.formState;
+
+  const { draft, save: saveDraft, clear: clearDraft, dismiss: dismissDraft } =
+    useFormDraft<FormValues>(DRAFT_KEY);
+
+  useEffect(() => {
+    const subscription = form.watch((values) => saveDraft(values as FormValues));
+    return () => subscription.unsubscribe();
+  }, [form, saveDraft]);
+
+  const restoreDraft = () => {
+    if (!draft) return;
+    form.reset(draft.values);
+    dismissDraft();
+    toast({
+      title: commonTranslations("draftRestored"),
+      description: commonTranslations("draftRestoredDescription"),
+    });
+  };
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addVehicle = () => {
-    append({
-      plateNumber: "",
-      make: "",
-      model: "",
-      province: "",
-      contractor: "",
-      senewiyahNumber: "",
-      wakalaNumber: "",
-      softskinArmored: "",
-      relatedPersons: [],
-      subcontractor: "",
-      associatedPetroChinaContractNumber: "",
-      contractHoldingPetroChinaDepartment: "",
-      eaLetterNumber: "",
-      numberInEaList: "",
-      securityClearanceExpiryDate: "",
-      photo: null as unknown as File,
-      senewiyah: null as unknown as File,
-      wakala: undefined,
-      armoredVehicleCertificate: undefined,
-    });
+    // Every vehicle in a request shares the same contract details, so carry
+    // them over instead of making the user retype them each time.
+    const previous = form.getValues(`vehicles.${fields.length - 1}`);
+    const shared = {
+      contractor: previous?.contractor ?? "",
+      subcontractor: previous?.subcontractor ?? "",
+      associatedPetroChinaContractNumber: previous?.associatedPetroChinaContractNumber ?? "",
+      contractHoldingPetroChinaDepartment: previous?.contractHoldingPetroChinaDepartment ?? "",
+      eaLetterNumber: previous?.eaLetterNumber ?? "",
+      securityClearanceExpiryDate: previous?.securityClearanceExpiryDate ?? "",
+    };
+
+    append({ ...EMPTY_VEHICLE, ...shared });
     setActiveTab(`vehicle-${fields.length}`);
+
+    if (Object.values(shared).some(Boolean)) {
+      toast({ title: commonTranslations("copiedFromPrevious") });
+    }
   };
 
   const removeVehicle = (index: number) => {
@@ -100,6 +148,27 @@ export default function VehiclesBadgeForm() {
     if (fields.length > 1) {
       setActiveTab(`vehicle-${Math.max(0, index - 1)}`);
     }
+  };
+
+  // Validation failures are easy to miss when the offending field sits on a
+  // tab that is not currently open, so jump to it and say so out loud.
+  const onInvalid = (formErrors: FieldErrors<FormValues>) => {
+    const vehicleErrors = (formErrors.vehicles ?? []) as unknown[];
+    const firstInvalid = vehicleErrors.findIndex(Boolean);
+    if (firstInvalid >= 0) setActiveTab(`vehicle-${firstInvalid}`);
+
+    toast({
+      title: commonTranslations("fixErrors"),
+      description: commonTranslations("fixErrorsDescription"),
+      variant: "destructive",
+    });
+
+    // Centre it so the floating navigation bar cannot cover it.
+    window.setTimeout(() => {
+      document
+        .querySelector('[aria-invalid="true"]')
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -114,40 +183,34 @@ export default function VehiclesBadgeForm() {
         "Armored Vehicle Certificates"
       );
 
+      // Add files to ZIP if they exist. The badging system only reads JPEG, so
+      // anything uploaded as PNG or GIF is re-encoded rather than just renamed.
+      await Promise.all(
+        data.vehicles.map(async (vehicle) => {
+          const plateNumber = vehicle.plateNumber;
+          const documentName = `${vehicle.make}+${vehicle.model}_${plateNumber}.jpg`;
+
+          if (photosFolder && vehicle.photo) {
+            photosFolder.file(`${plateNumber}.jpg`, await toJpeg(vehicle.photo));
+          }
+          if (senewiyahsFolder && vehicle.senewiyah) {
+            senewiyahsFolder.file(documentName, await toJpeg(vehicle.senewiyah));
+          }
+          if (wakalasFolder && vehicle.wakala) {
+            wakalasFolder.file(documentName, await toJpeg(vehicle.wakala));
+          }
+          if (armoredVehicleCertificatesFolder && vehicle.armoredVehicleCertificate) {
+            armoredVehicleCertificatesFolder.file(
+              documentName,
+              await toJpeg(vehicle.armoredVehicleCertificate)
+            );
+          }
+        })
+      );
+
       // Prepare Excel data
       const excelData = data.vehicles.map((vehicle) => {
         const plateNumber = vehicle.plateNumber;
-        const photoName = vehicle.photo ? `${plateNumber}.jpg` : null;
-        const senewiyahName = vehicle.senewiyah
-          ? `${vehicle.make}+${vehicle.model}_${plateNumber}.jpg`
-          : null;
-        const wakalaName = vehicle.wakala
-          ? `${vehicle.make}+${vehicle.model}_${plateNumber}.jpg`
-          : null;
-        const armoredVehicleCertificateName = vehicle.armoredVehicleCertificate
-          ? `${vehicle.make}+${vehicle.model}_${plateNumber}.jpg`
-          : null;
-
-        // Add files to ZIP if they exist
-        if (photosFolder && vehicle.photo && photoName) {
-          photosFolder.file(photoName, vehicle.photo);
-        }
-        if (senewiyahsFolder && vehicle.senewiyah && senewiyahName) {
-          senewiyahsFolder.file(senewiyahName, vehicle.senewiyah);
-        }
-        if (wakalasFolder && vehicle.wakala && wakalaName) {
-          wakalasFolder.file(wakalaName, vehicle.wakala);
-        }
-        if (
-          armoredVehicleCertificatesFolder &&
-          vehicle.armoredVehicleCertificate &&
-          armoredVehicleCertificateName
-        ) {
-          armoredVehicleCertificatesFolder.file(
-            armoredVehicleCertificateName,
-            vehicle.armoredVehicleCertificate
-          );
-        }
 
         return {
           ID: plateNumber,
@@ -259,6 +322,8 @@ export default function VehiclesBadgeForm() {
         zipBlob,
         `${excelData[0]["Company Name"]} - ${excelData.length} vehicles request.zip`
       );
+
+      clearDraft();
 
       toast({
         title: formTranslations("createZIPSuccess"),
@@ -442,13 +507,33 @@ export default function VehiclesBadgeForm() {
         mass: 1,
       }}
     >
+      {draft && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <RotateCcw className="h-5 w-5 text-amber-600 shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-amber-900">
+              {commonTranslations("draftFound", {
+                when: new Date(draft.savedAt).toLocaleString(intlLocale(locale)),
+              })}
+            </p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              {commonTranslations("draftPhotosNotIncluded")}
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button type="button" size="sm" variant="outline" onClick={restoreDraft}>
+              {commonTranslations("draftRestore")}
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={clearDraft}>
+              {commonTranslations("draftDiscard")}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Card className="rounded-xl shadow-none border overflow-hidden">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit, (errors) => {
-              console.log(errors);
-            })}
-          >
+          <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
@@ -456,20 +541,25 @@ export default function VehiclesBadgeForm() {
               dir={isRTL ? "rtl" : "ltr"}
             >
               <TabsList className="flex justify-start gap-x-2 rounded-none bg-green-50 items-center p-2 container overflow-x-scroll h-auto scroll-smooth scrollbar flex-row">
-                {fields.map((field: any, index: any) => (
-                  <TabsTrigger
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "rounded-xl bg-blue-50"
-                    )}
-                    key={field.id}
-                    value={`vehicle-${index}`}
-                  >
-                    {field.plateNumber
-                      ? field.plateNumber
-                      : `${formTranslations("vehicle")} ${index + 1}`}
-                  </TabsTrigger>
-                ))}
+                {fields.map((field: any, index: any) => {
+                  const plateNumber = watchedVehicles?.[index]?.plateNumber;
+                  const hasError = Boolean(errors.vehicles?.[index]);
+
+                  return (
+                    <TabsTrigger
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "rounded-xl bg-blue-50 gap-x-1.5",
+                        hasError && "border-red-400 bg-red-50 text-red-600"
+                      )}
+                      key={field.id}
+                      value={`vehicle-${index}`}
+                    >
+                      {hasError && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+                      {plateNumber || `${formTranslations("vehicle")} ${index + 1}`}
+                    </TabsTrigger>
+                  );
+                })}
                 <Button
                   type="button"
                   onClick={addVehicle}
@@ -824,6 +914,11 @@ export default function VehiclesBadgeForm() {
                                 </FormControl>
                                 <FormDescription>
                                   {formDescriptions("enterSecurityClearanceExpiryDate")}
+                                  {formatExpiryDate(field.value) && (
+                                    <span className="block mt-1 font-medium text-gray-700" dir="ltr">
+                                      {commonTranslations("willBeWrittenAs")}: {formatExpiryDate(field.value)}
+                                    </span>
+                                  )}
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
@@ -1097,8 +1192,11 @@ export default function VehiclesBadgeForm() {
               ))}
             </Tabs>
             <CardFooter className="py-4 border-t flex justify-between">
-              <Button className="w-full sm:w-auto" type="submit">
-                {formTranslations("generateZIP")}
+              <Button className="w-full sm:w-auto" type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting
+                  ? commonTranslations("generating")
+                  : formTranslations("generateZIP")}
               </Button>
             </CardFooter>
           </form>

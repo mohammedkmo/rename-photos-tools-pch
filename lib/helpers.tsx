@@ -8,6 +8,10 @@ export const formatDate = (date: Date) => {
     return `${yyyy}/${mm}/${dd} ${hh}:${min}:${ss}`;
   };
 
+// The app uses "cn" for Chinese, which is not a valid BCP 47 tag - passing it
+// straight to Intl throws a RangeError.
+export const intlLocale = (locale: string) => (locale === 'cn' ? 'zh-CN' : locale);
+
 // Badges always expire at the end of the working day.
 export const EXPIRY_TIME_OF_DAY = '6:00:00 PM';
 

@@ -19,7 +19,19 @@
     "pleaseUseComputer": "Please use a computer to access this application.",
     "personalBadges": "Personal Badges",
     "vehicleBadges": "Vehicles Badges",
-    "tempBadges": "Temporary Badges"
+    "tempBadges": "Temporary Badges",
+    "continueAnyway": "Continue anyway",
+    "draftFound": "You have unsaved work from {when}.",
+    "draftPhotosNotIncluded": "Photos and documents are not saved and will need to be uploaded again.",
+    "draftRestore": "Restore",
+    "draftDiscard": "Discard",
+    "draftRestored": "Draft restored",
+    "draftRestoredDescription": "Your text entries are back. Please upload the photos and documents again.",
+    "fixErrors": "Some details are missing",
+    "fixErrorsDescription": "Check the highlighted tabs and fill in the required fields.",
+    "generating": "Generating ZIP...",
+    "copiedFromPrevious": "Company details copied from the previous entry",
+    "willBeWrittenAs": "Will be written as"
   },
   "header": {
     "home": "Home"

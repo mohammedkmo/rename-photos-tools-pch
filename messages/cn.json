@@ -19,7 +19,19 @@
     "pleaseUseComputer": "请使用电脑访问此应用程序",
     "personalBadges": "个人证件",
     "vehicleBadges": "车辆证件",
-    "tempBadges": "临时证件"
+    "tempBadges": "临时证件",
+    "continueAnyway": "仍要继续",
+    "draftFound": "您有未保存的内容，保存于 {when}。",
+    "draftPhotosNotIncluded": "照片和文件不会被保存，需要重新上传。",
+    "draftRestore": "恢复",
+    "draftDiscard": "放弃",
+    "draftRestored": "草稿已恢复",
+    "draftRestoredDescription": "文字内容已恢复，请重新上传照片和文件。",
+    "fixErrors": "部分信息缺失",
+    "fixErrorsDescription": "请检查标记的选项卡并填写必填字段。",
+    "generating": "正在生成 ZIP...",
+    "copiedFromPrevious": "已从上一条记录复制公司信息",
+    "willBeWrittenAs": "将写入为"
   },
   "header": {
     "home": "首页"

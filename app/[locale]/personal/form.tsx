@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, type FieldErrors } from "react-hook-form";
 import {
     Form,
     FormControl,
@@ -16,7 +16,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { FileArchive, Trash2, Upload } from "lucide-react";
+import { AlertCircle, FileArchive, Loader2, RotateCcw, Trash2, Upload } from "lucide-react";
 import { FormValues, formSchema } from "@/schema/employee";
 import {
     Select,
@@ -30,12 +30,36 @@ import CustomFileUpload from "@/components/ui/customFileUpload";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from 'xlsx-js-style';
-import { formatDate, formatExpiryDate, parseExpiryDate } from "@/lib/helpers";
+import { formatDate, formatExpiryDate, intlLocale, parseExpiryDate } from "@/lib/helpers";
+import { toJpeg } from "@/lib/images";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { motion } from "framer-motion";
+
+const DRAFT_KEY = "hfyc:draft:personal";
+
+const EMPTY_EMPLOYEE = {
+    id: "",
+    firstName: "",
+    lastName: "",
+    contractor: "",
+    position: "",
+    idDocumentNumber: "",
+    nationality: "",
+    subcontractor: "",
+    associatedPetroChinaContractNumber: "",
+    contractHoldingPetroChinaDepartment: "",
+    eaLetterNumber: "",
+    numberInEaList: "",
+    securityClearanceExpiryDate: "",
+    photo: null as unknown as File,
+    idDocument: null as unknown as File,
+    drivingLicense: undefined,
+    moiCard: undefined,
+};
 
 export default function PersonalBadgeForm() {
     const locale = useLocale();
@@ -43,14 +67,17 @@ export default function PersonalBadgeForm() {
     const formTranslations = useTranslations('personalBadge.form');
     const formDescriptions = useTranslations('formDescriptions.personal');
     const companyDescriptions = useTranslations('formDescriptions.company');
+    const commonTranslations = useTranslations('common');
 
     const [activeTab, setActiveTab] = useState("employee-0");
-    const [tabTitle, setTabTitle] = useState('');
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema(formTranslations)),
+        // Report problems as each field is left rather than saving them all up
+        // for the moment the user hits submit.
+        mode: "onTouched",
         defaultValues: {
-            employees: [{}],
+            employees: [EMPTY_EMPLOYEE],
         },
     });
 
@@ -59,29 +86,49 @@ export default function PersonalBadgeForm() {
         control: form.control,
     });
 
+    // Drives the tab labels so they follow the names as they are typed.
+    const watchedEmployees = useWatch({ control: form.control, name: "employees" });
+    const { errors, isSubmitting } = form.formState;
+
+    const { draft, save: saveDraft, clear: clearDraft, dismiss: dismissDraft } =
+        useFormDraft<FormValues>(DRAFT_KEY);
+
+    useEffect(() => {
+        const subscription = form.watch((values) => saveDraft(values as FormValues));
+        return () => subscription.unsubscribe();
+    }, [form, saveDraft]);
+
+    const restoreDraft = () => {
+        if (!draft) return;
+        form.reset(draft.values);
+        dismissDraft();
+        toast({
+            title: commonTranslations('draftRestored'),
+            description: commonTranslations('draftRestoredDescription'),
+        });
+    };
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const addEmployee = () => {
-        append({
-            id: "",
-            firstName: "",
-            lastName: "",
-            contractor: "",
-            position: "",
-            idDocumentNumber: "",
-            nationality: "",
-            subcontractor: "",
-            associatedPetroChinaContractNumber: "",
-            contractHoldingPetroChinaDepartment: "",
-            eaLetterNumber: "",
-            numberInEaList: "",
-            securityClearanceExpiryDate: "",
-            photo: null as unknown as File,
-            idDocument: null as unknown as File,
-            drivingLicense: undefined,
-            moiCard: undefined,
-        });
+        // Everyone in a request shares the same contract details, so carry them
+        // over instead of making the user retype them for each employee.
+        const previous = form.getValues(`employees.${fields.length - 1}`);
+        const shared = {
+            contractor: previous?.contractor ?? "",
+            subcontractor: previous?.subcontractor ?? "",
+            associatedPetroChinaContractNumber: previous?.associatedPetroChinaContractNumber ?? "",
+            contractHoldingPetroChinaDepartment: previous?.contractHoldingPetroChinaDepartment ?? "",
+            eaLetterNumber: previous?.eaLetterNumber ?? "",
+            securityClearanceExpiryDate: previous?.securityClearanceExpiryDate ?? "",
+        };
+
+        append({ ...EMPTY_EMPLOYEE, ...shared });
         setActiveTab(`employee-${fields.length}`);
+
+        if (Object.values(shared).some(Boolean)) {
+            toast({ title: commonTranslations('copiedFromPrevious') });
+        }
     };
 
     const removeEmployee = (index: number) => {
@@ -89,6 +136,27 @@ export default function PersonalBadgeForm() {
         if (fields.length > 1) {
             setActiveTab(`employee-${Math.max(0, index - 1)}`);
         }
+    };
+
+    // Validation failures are easy to miss when the offending field sits on a
+    // tab that is not currently open, so jump to it and say so out loud.
+    const onInvalid = (formErrors: FieldErrors<FormValues>) => {
+        const employeeErrors = (formErrors.employees ?? []) as unknown[];
+        const firstInvalid = employeeErrors.findIndex(Boolean);
+        if (firstInvalid >= 0) setActiveTab(`employee-${firstInvalid}`);
+
+        toast({
+            title: commonTranslations('fixErrors'),
+            description: commonTranslations('fixErrorsDescription'),
+            variant: "destructive",
+        });
+
+        // Centre it so the floating navigation bar cannot cover it.
+        window.setTimeout(() => {
+            document
+                .querySelector('[aria-invalid="true"]')
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 50);
     };
 
     const onSubmit = async (data: FormValues) => {
@@ -101,35 +169,27 @@ export default function PersonalBadgeForm() {
         const drivingLicensesFolder = zip.folder("Driving Licences");
         const moiCardsFolder = zip.folder("MOI Cards");
 
+        // Add files to ZIP. The badging system only reads JPEG, so anything
+        // uploaded as PNG or GIF is re-encoded rather than just renamed.
+        await Promise.all(
+            data.employees.map(async (employee) => {
+                const badgeNumber = `HFYC${employee.id}`;
+                const fileName = `${employee.firstName}+${employee.lastName}_${badgeNumber}.jpg`;
+
+                photosFolder!.file(fileName, await toJpeg(employee.photo));
+                idDocsFolder!.file(fileName, await toJpeg(employee.idDocument));
+                if (employee.drivingLicense) {
+                    drivingLicensesFolder!.file(fileName, await toJpeg(employee.drivingLicense));
+                }
+                if (employee.moiCard) {
+                    moiCardsFolder!.file(fileName, await toJpeg(employee.moiCard));
+                }
+            })
+        );
+
         // Prepare Excel data
-        const excelData = data.employees.map((employee, index) => {
+        const excelData = data.employees.map((employee) => {
             const badgeNumber = `HFYC${employee.id}`;
-            const photoName = `${employee.firstName}+${employee.lastName}_${badgeNumber}.jpg`;
-            const idName = `${employee.firstName}+${employee.lastName}_${badgeNumber}.jpg`;
-            const drivingLicenseName = employee.drivingLicense
-                ? `${employee.firstName}+${employee.lastName}_${badgeNumber}.jpg`
-                : null;
-
-            const moiCardName = employee.moiCard
-                ? `${employee.firstName}+${employee.lastName}_${badgeNumber}.jpg`
-                : null;
-
-            // Add files to ZIP
-            photosFolder!.file(photoName, employee.photo);
-            idDocsFolder!.file(idName, employee.idDocument);
-            if (employee.drivingLicense) {
-                if (drivingLicenseName) {
-                    drivingLicensesFolder!.file(
-                        drivingLicenseName,
-                        employee.drivingLicense
-                    );
-                }
-            }
-            if (employee.moiCard) {
-                if (moiCardName) {
-                    moiCardsFolder!.file(moiCardName, employee.moiCard);
-                }
-            }
 
             // Return employee data for Excel
             return {
@@ -219,9 +279,11 @@ export default function PersonalBadgeForm() {
         const zipBlob = await zip.generateAsync({ type: "blob" });
         saveAs(zipBlob, `${excelData[0]["Company Name"]} - ${excelData.length} employees request.zip`);
 
-        toast({ 
-            title: formTranslations('createZIPSuccess'), 
-            description: formTranslations('createZIPSuccessDescription') 
+        clearDraft();
+
+        toast({
+            title: formTranslations('createZIPSuccess'),
+            description: formTranslations('createZIPSuccessDescription')
         });
 
         const notificationMessage = `New request submitted by ${data.employees[0].contractor} for ${data.employees.length} employee(s).`;
@@ -339,9 +401,33 @@ export default function PersonalBadgeForm() {
           mass: 1,
         }}
         >
+            {draft && (
+                <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <RotateCcw className="h-5 w-5 text-amber-600 shrink-0" />
+                    <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-900">
+                            {commonTranslations('draftFound', {
+                                when: new Date(draft.savedAt).toLocaleString(intlLocale(locale)),
+                            })}
+                        </p>
+                        <p className="text-xs text-amber-700 mt-0.5">
+                            {commonTranslations('draftPhotosNotIncluded')}
+                        </p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                        <Button type="button" size="sm" variant="outline" onClick={restoreDraft}>
+                            {commonTranslations('draftRestore')}
+                        </Button>
+                        <Button type="button" size="sm" variant="ghost" onClick={clearDraft}>
+                            {commonTranslations('draftDiscard')}
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <Card className="rounded-xl shadow-none border overflow-hidden">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
                         <Tabs
                             value={activeTab}
                             onValueChange={setActiveTab}
@@ -349,17 +435,28 @@ export default function PersonalBadgeForm() {
                             dir={isRTL ? 'rtl' : 'ltr'}
                         >
                             <TabsList className="flex rounded-none justify-start gap-x-2 bg-blue-50 items-center p-2 container overflow-x-scroll h-auto scroll-smooth scrollbar flex-row">
-                                {fields.map((field: any, index: any) => (
-                                    <TabsTrigger
-                                        className={cn(buttonVariants({ variant: "outline" }), "rounded-xl bg-blue-50")}
-                                        key={field.id}
-                                        value={`employee-${index}`}
-                                    >
-                                        {field.firstName || field.lastName
-                                            ? field.firstName + " " + field.lastName
-                                            : `${formTranslations('employee')} ${index + 1}`}
-                                    </TabsTrigger>
-                                ))}
+                                {fields.map((field: any, index: any) => {
+                                    const employee = watchedEmployees?.[index];
+                                    const name = [employee?.firstName, employee?.lastName]
+                                        .filter(Boolean)
+                                        .join(" ");
+                                    const hasError = Boolean(errors.employees?.[index]);
+
+                                    return (
+                                        <TabsTrigger
+                                            className={cn(
+                                                buttonVariants({ variant: "outline" }),
+                                                "rounded-xl bg-blue-50 gap-x-1.5",
+                                                hasError && "border-red-400 bg-red-50 text-red-600"
+                                            )}
+                                            key={field.id}
+                                            value={`employee-${index}`}
+                                        >
+                                            {hasError && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+                                            {name || `${formTranslations('employee')} ${index + 1}`}
+                                        </TabsTrigger>
+                                    );
+                                })}
                                 <Button
                                     type="button"
                                     onClick={addEmployee}
@@ -651,6 +748,11 @@ export default function PersonalBadgeForm() {
                                                                 </FormControl>
                                                                 <FormDescription>
                                                                     {formDescriptions('enterSecurityClearanceExpiryDate')}
+                                                                    {formatExpiryDate(field.value) && (
+                                                                        <span className="block mt-1 font-medium text-gray-700" dir="ltr">
+                                                                            {commonTranslations('willBeWrittenAs')}: {formatExpiryDate(field.value)}
+                                                                        </span>
+                                                                    )}
                                                                 </FormDescription>
                                                                 <FormMessage />
                                                             </FormItem>
@@ -770,8 +872,11 @@ export default function PersonalBadgeForm() {
                             ))}
                         </Tabs>
                         <CardFooter className="py-4 border-t flex justify-between">
-                            <Button className="w-full sm:w-auto" type="submit">
-                                {formTranslations('generateZIP')}
+                            <Button className="w-full sm:w-auto" type="submit" disabled={isSubmitting}>
+                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isSubmitting
+                                    ? commonTranslations('generating')
+                                    : formTranslations('generateZIP')}
                             </Button>
                         </CardFooter>
                     </form>
