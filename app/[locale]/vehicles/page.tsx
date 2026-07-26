@@ -1,7 +1,4 @@
-import Image from "next/image";
 import { Metadata } from "next";
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
 import VehiclesBadgeForm from "./form";
 
 export const metadata: Metadata = {
@@ -10,34 +7,11 @@ export const metadata: Metadata = {
 }
 
 export default function VehiclesBadgePage() {
-  const t = useTranslations('vehiclesBadge');
-  const commonT = useTranslations('common');
-  const locale = useLocale();
-  const isRTL = locale === 'ar'; // Assuming 'ar' is the RTL language code
-
+  // The grid owns its own scrolling, so the page fills the space under the
+  // 3.5rem header exactly rather than growing the document.
   return (
-      <div className="w-full flex items-center justify-center py-10 pb-32 bg-gradient-to-t from-white to-green-100 min-h-[85vh]">
-        <div className="container rounded-2xl bg-white p-6">
-          <div className={`mb-5 w-full md:w-8/12 relative`}>
-            <Image 
-              src={isRTL ? '/arrow-rtl.svg' : '/arrow.svg'}
-              className={`absolute top-7 hidden md:block ${isRTL ? 'left-[-12rem]' : 'right-[-11rem]'}`} 
-              alt="arrow" 
-              width={180} 
-              height={180} 
-              draggable="false"
-              style={{ userSelect: 'none', pointerEvents: 'none' }}
-            />
-
-            <h1 className="font-bold text-2xl">{t('title')}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t('description')}
-              <br />
-              {commonT('email')} <a href="mailto:pch-badging@petrochina-hfy.com" className="text-blue-500">pch-badging@petrochina-hfy.com</a>
-            </p>
-          </div>
-          <VehiclesBadgeForm />
-        </div>
-      </div>
+    <div className="flex-1 min-h-0 flex flex-col h-[calc(100dvh-3.5rem)]">
+      <VehiclesBadgeForm />
+    </div>
   );
 }

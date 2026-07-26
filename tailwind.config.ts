@@ -22,6 +22,31 @@ const config = {
 		   ibmPlexSansArabic: ['var(--font-arabic)'],
 		},
   		colors: {
+  			// Badging tool palette: navy ink rather than black, a cool
+  			// off-white ground, hairline rules, indigo kept for the primary
+  			// action only, and PetroChina red reserved for the logo.
+  			pch: {
+  				ground: '#F6F9FC',
+  				surface: '#FFFFFF',
+  				subtle: '#F7FAFC',
+  				ink: '#0A2540',
+  				ink2: '#425466',
+  				ink3: '#8792A2',
+  				line: '#E6EBF1',
+  				line2: '#D5DBE1',
+  				accent: '#635BFF',
+  				accentInk: '#4B44D6',
+  				accentSoft: '#F0F0FF',
+  				okBg: '#CBF4C9',
+  				okInk: '#0E6245',
+  				warnBg: '#F8E5B9',
+  				warnInk: '#983705',
+  				warnEdge: '#E5A94A',
+  				stopBg: '#FDE2DD',
+  				stopInk: '#A41C4E',
+  				stopEdge: '#E25950',
+  				brand: '#D6202A',
+  			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

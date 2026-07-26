@@ -5,12 +5,10 @@
     "applyingForPersonalBadges": "التقدم للحصول على باجات شخصية",
     "applyingForVehicleBadges": "التقدم للحصول على باجات المركبات",
     "downloadExcelRegister": "تحميل سجل Excel",
-    "renamePhotosNow": "إعادة تسمية صورك الآن",
     "byPCHBadgingTeam": "@بواسطة فريق باجات PCH",
     "noUploadDisclaimer": "⚠️ لن يتم تحميل أي ملفات أو صور إلى خادمنا أو أي خوادم أخرى، جميع الوظائف تعمل على جانب العميل فقط",
     "email": "البريد الإلكتروني:",
     "emailAddress": "contractor-badging@petrochina-hfy.com",
-    "renamePhotosTool": "أداة إعادة تسمية الصور",
     "home": "الرئيسية",
     "mobileNotSupported": "الهاتف غير مدعوم",
     "pleaseUseComputer": "يرجى استخدام الكمبيوتر للوصول إلى هذا التطبيق.",
@@ -94,7 +92,8 @@
         "photoRequired": "صورة الموظف مطلوبة",
         "idDocumentRequired": "وثيقة هوية الموظف مطلوبة",
         "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً",
-        "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب"
+        "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب",
+        "badgeNumberDuplicate": "رقم الباج مستخدم بالفعل في الصف {row}"
       },
       "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
@@ -162,35 +161,12 @@
         "numberInEaListRequired": "الرقم في قائمة EA مطلوب",
         "photoRequired": "صورة المركبة مطلوبة",
         "senewiyahRequired": "وثيقة السنوية مطلوبة",
-        "maxFileSize": "الحد الأقصى لحجم الملف هو 10 ميجابايت"
+        "maxFileSize": "الحد الأقصى لحجم الملف هو 10 ميجابايت",
+        "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب",
+        "atLeastOneVehicleRequired": "مطلوب مركبة واحدة على الأقل",
+        "plateNumberDuplicate": "رقم اللوحة مستخدم بالفعل في الصف {row}"
       },
       "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
-    }
-  },
-  "renamePhotos": {
-    "title": "أداة إعادة تسمية الصور",
-    "common": {
-      "byPCHBadgingTeam": "@بواسطة فريق باجات PCH",
-      "noUploadDisclaimer": "⚠️ لن يتم تحميل أي ملفات أو صور إلى خادمنا أو أي خوادم أخرى، جميع الوظائف تعمل على جانب العميل فقط"
-    },
-    "instructions": {
-      "title": "تعليمات ملف Excel",
-      "description": "تتيح لك هذه الأداة إعادة تسمية صور متعددة دفعة واحدة",
-      "excelRequirements": "ستحتاج إلى إعداد ملف Excel يحتوي على الأعمدة التالية: الاسم الأول، اسم العائلة، ورقم HFYC. يرجى الاطلاع على المثال أدناه:",
-      "downloadExcel": "حمل ملف Excel الذي يحتوي على الأعمدة المطلوبة",
-      "renamePhotosNow": "إعادة تسمية الصور الخاصة بك الآن"
-    },
-    "form": {
-      "noHFYCNumberAddedYet": "لم يتم إضافة رقم HFYC بعد",
-      "enterHFYCNumber": "أدخل رقم HFYC واضغط على Enter (مثال: HFYC0001)",
-      "selectImages": "اختر الصور",
-      "multipleImagesHint": "يمكنك تحميل عدة ملفات صور معاً",
-      "excelFile": "ملف Excel",
-      "excelFileHint": "قم بتحميل ملف Excel يحتوي على أعمدة رقم HFYC والاسم الأول واسم العائلة. يرجى قراءة التعليمات التالية",
-      "here": "هنا"
-    },
-    "buttons": {
-      "generateZIP": "إنشاء ZIP"
     }
   },
   "formDescriptions": {
@@ -258,8 +234,7 @@
   },
   "success": {
     "formSubmitted": "تم إرسال النموذج بنجاح",
-    "zipGenerated": "تم إنشاء ملف ZIP بنجاح",
-    "photosRenamed": "تم إعادة تسمية الصور بنجاح"
+    "zipGenerated": "تم إنشاء ملف ZIP بنجاح"
   },
   "confirmations": {
     "deleteEmployee": "هل أنت متأكد من أنك تريد حذف هذا الموظف؟",
@@ -277,5 +252,52 @@
     "eaLetterNumber": "رقم خطاب التصريح الأمني",
     "fleetNumber": "رقم المركبة للمركبة (إن وجد)",
     "chassisNumber": "رقم الهيكل الفريد للمركبة"
+  },
+  "grid": {
+    "person": "الشخص",
+    "identity": "الهوية",
+    "contract": "العقد",
+    "clearance": "الموافقة الأمنية",
+    "documents": "المستندات",
+    "employees": "الموظفون",
+    "photos": "الصور",
+    "needAttention": "تحتاج مراجعة",
+    "removeRow": "حذف هذا الصف",
+    "keyboardHint": "Tab للتنقل للأمام، Shift+Tab للخلف",
+    "fixErrorsInGrid": "يجب تصحيح الخانات المميزة قبل إنشاء الملف.",
+    "employeeCount": "{count} موظف",
+    "photoCount": "{count} صورة",
+    "attentionCount": "{count} صفوف تحتاج مراجعة",
+    "colBadge": "رقم الباج",
+    "colFirstName": "الاسم",
+    "colLastName": "اللقب",
+    "colPosition": "المنصب",
+    "colIdDocument": "رقم الهوية",
+    "colNationality": "الجنسية",
+    "colSubcontractor": "المقاول الثانوي",
+    "colEaLetter": "كتاب EA",
+    "colEaList": "رقم بالقائمة",
+    "colExpires": "تاريخ الانتهاء",
+    "colPhoto": "الصورة",
+    "colId": "الهوية",
+    "colLicence": "الإجازة",
+    "colMoi": "بطاقة الداخلية",
+    "colPlate": "رقم اللوحة",
+    "colProvince": "المحافظة",
+    "colMake": "النوع",
+    "colModel": "الموديل",
+    "colArmored": "مصفحة",
+    "colSenewiyah": "السنوية",
+    "colWakala": "الوكالة",
+    "colDrivers": "باجات السائقين",
+    "colVehiclePhoto": "الصورة",
+    "colSenewiyahDoc": "السنوية",
+    "colWakalaDoc": "الوكالة",
+    "colArmoredDoc": "الشهادة",
+    "vehicle": "المركبة",
+    "registration": "التسجيل",
+    "drivers": "السائقون",
+    "vehicleCount": "{count} مركبة",
+    "driversHint": "مفصولة بفواصل، مثال: HFYC1234, HFYC5678"
   }
 }

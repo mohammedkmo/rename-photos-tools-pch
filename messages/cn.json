@@ -5,12 +5,10 @@
     "applyingForPersonalBadges": "申请个人证件",
     "applyingForVehicleBadges": "申请车辆证件",
     "downloadExcelRegister": "下载 Excel 登记表",
-    "renamePhotosNow": "立即重命名照片",
     "byPCHBadgingTeam": "@PCH 证件团队制作",
     "noUploadDisclaimer": "⚠️ 不会将任何文件或图片上传到我们的服务器或任何其他服务器，所有功能仅在客户端运行",
     "email": "电子邮件：",
     "emailAddress": "contractor-badging@petrochina-hfy.com",
-    "renamePhotosTool": "照片重命名工具",
     "home": "首页",
     "mobileNotSupported": "不支持移动设备",
     "pleaseUseComputer": "请使用电脑访问此应用程序",
@@ -95,7 +93,8 @@
         "idDocumentRequired": "需要身份证件",
         "drivingLicenseRequired": "需要驾驶证",
         "moiCardRequired": "需要内政部卡",
-        "securityClearanceExpiryDateRequired": "安全许可到期日期为必填项"
+        "securityClearanceExpiryDateRequired": "安全许可到期日期为必填项",
+        "badgeNumberDuplicate": "该证件号已被第 {row} 行使用"
       },
       "securityClearanceExpiryDate": "安全许可到期日期"
     }
@@ -163,35 +162,12 @@
         "numberInEaListRequired": "需要 EA 清单中的编号",
         "photoRequired": "需要车辆照片",
         "senewiyahRequired": "需要年检证",
-        "maxFileSize": "文件大小最大为 10MB"
+        "maxFileSize": "文件大小最大为 10MB",
+        "securityClearanceExpiryDateRequired": "安全许可到期日期为必填项",
+        "atLeastOneVehicleRequired": "至少需要一辆车",
+        "plateNumberDuplicate": "该车牌号已被第 {row} 行使用"
       },
       "securityClearanceExpiryDate": "安全许可到期日期"
-    }
-  },
-  "renamePhotos": {
-    "title": "照片重命名工具",
-    "common": {
-      "byPCHBadgingTeam": "@PCH 证件团队制作",
-      "noUploadDisclaimer": "⚠️ 不会将任何文件或图片上传到我们的服务器或任何其他服务器，所有功能仅在客户端运行"
-    },
-    "instructions": {
-      "title": "Excel 文件说明",
-      "description": "此工具允许您批量重命名多张照片",
-      "excelRequirements": "您需要准备一个包含以下列的 Excel 文件：名字、姓氏和 HFYC 编号。请参考以下示例：",
-      "downloadExcel": "下载包含所需列的 Excel 文件",
-      "renamePhotosNow": "立即重命名您的照片"
-    },
-    "form": {
-      "noHFYCNumberAddedYet": "尚未添加 HFYC 编号",
-      "enterHFYCNumber": "输入 HFYC 编号并按回车键（例如：HFYC0001）",
-      "selectImages": "选择图片",
-      "multipleImagesHint": "您可以同时上传多个图片文件",
-      "excelFile": "Excel 文件",
-      "excelFileHint": "您可以上传包含所需列的 Excel 文件",
-      "here": "这里"
-    },
-    "buttons": {
-      "generateZIP": "生成 ZIP"
     }
   },
   "formDescriptions": {
@@ -256,8 +232,7 @@
   },
   "success": {
     "formSubmitted": "表单提交成功",
-    "zipGenerated": "ZIP 文件生成成功",
-    "photosRenamed": "照片重命名成功"
+    "zipGenerated": "ZIP 文件生成成功"
   },
   "confirmations": {
     "deleteEmployee": "您确定要删除此员工吗？",
@@ -275,5 +250,52 @@
     "eaLetterNumber": "安全授权信函编号",
     "fleetNumber": "车辆的车队编号（如有）",
     "chassisNumber": "车辆的唯一底盘号"
+  },
+  "grid": {
+    "person": "人员",
+    "identity": "身份",
+    "contract": "合同",
+    "clearance": "安全许可",
+    "documents": "文件",
+    "employees": "员工",
+    "photos": "照片",
+    "needAttention": "需处理",
+    "removeRow": "删除此行",
+    "keyboardHint": "Tab 向前移动，Shift+Tab 返回",
+    "fixErrorsInGrid": "生成 ZIP 前请修正标记的单元格。",
+    "employeeCount": "{count} 名员工",
+    "photoCount": "{count} 张照片",
+    "attentionCount": "{count} 行需处理",
+    "colBadge": "证件号",
+    "colFirstName": "名",
+    "colLastName": "姓",
+    "colPosition": "职位",
+    "colIdDocument": "证件号码",
+    "colNationality": "国籍",
+    "colSubcontractor": "分包商",
+    "colEaLetter": "EA 函号",
+    "colEaList": "名单序号",
+    "colExpires": "到期日",
+    "colPhoto": "照片",
+    "colId": "证件",
+    "colLicence": "驾照",
+    "colMoi": "内政部卡",
+    "colPlate": "车牌号",
+    "colProvince": "省份",
+    "colMake": "品牌",
+    "colModel": "型号",
+    "colArmored": "装甲",
+    "colSenewiyah": "年检号",
+    "colWakala": "委托书号",
+    "colDrivers": "司机证件",
+    "colVehiclePhoto": "照片",
+    "colSenewiyahDoc": "年检",
+    "colWakalaDoc": "委托书",
+    "colArmoredDoc": "证书",
+    "vehicle": "车辆",
+    "registration": "登记",
+    "drivers": "司机",
+    "vehicleCount": "{count} 辆车",
+    "driversHint": "用逗号分隔，例如 HFYC1234, HFYC5678"
   }
 }

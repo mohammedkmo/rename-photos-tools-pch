@@ -33,11 +33,13 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={rubik.className}>
+      <body className={`${rubik.className} bg-pch-ground text-pch-ink`}>
         <NextIntlClientProvider messages={messages}>
           <DeviceProvider>
-            <Header />
-            {children}
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              {children}
+            </div>
           </DeviceProvider>
         </NextIntlClientProvider>
         <Toaster />
