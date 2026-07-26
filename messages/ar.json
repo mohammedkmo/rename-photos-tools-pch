@@ -4,7 +4,6 @@
     "whatLookingFor": "ما الذي تبحث عنه؟",
     "applyingForPersonalBadges": "التقدم للحصول على باجات شخصية",
     "applyingForVehicleBadges": "التقدم للحصول على باجات المركبات",
-    "applyingForTemporaryBadges": "التقدم للحصول على باجات مؤقتة",
     "downloadExcelRegister": "تحميل سجل Excel",
     "renamePhotosNow": "إعادة تسمية صورك الآن",
     "byPCHBadgingTeam": "@بواسطة فريق باجات PCH",
@@ -13,13 +12,10 @@
     "emailAddress": "contractor-badging@petrochina-hfy.com",
     "renamePhotosTool": "أداة إعادة تسمية الصور",
     "home": "الرئيسية",
-    "comingSoon": "قريباً",
-    "comingSoonDescription": "الميزة ستصبح متاحة قريباً",
     "mobileNotSupported": "الهاتف غير مدعوم",
     "pleaseUseComputer": "يرجى استخدام الكمبيوتر للوصول إلى هذا التطبيق.",
     "personalBadges": "باجات شخصية",
     "vehicleBadges": "باجات المركبات",
-    "tempBadges": "باجات مؤقتة",
     "continueAnyway": "المتابعة على أي حال",
     "draftFound": "لديك عمل غير محفوظ من {when}.",
     "draftPhotosNotIncluded": "لا يتم حفظ الصور والمستندات وستحتاج إلى رفعها مرة أخرى.",
@@ -281,30 +277,5 @@
     "eaLetterNumber": "رقم خطاب التصريح الأمني",
     "fleetNumber": "رقم المركبة للمركبة (إن وجد)",
     "chassisNumber": "رقم الهيكل الفريد للمركبة"
-  },
-  "temporaryBadge": {
-    "title": "طلب باج مؤقت",
-    "description": "يرجى ملء تفاصيل الموظف وتحميل المستندات المطلوبة. هذه العملية تتم بالكامل على جانب العميل، مما يضمن عدم تخزين أي بيانات على خادمنا. بمجرد الانتهاء، قم بتنزيل ملف ZIP وإرساله، مع التصريح الأمني اللازم، إلى مكتب باجات PCH على عنوان البريد الإلكتروني المقدم. شكرًا لتعاونكم.",
-    "form": {
-      "name": "اسم الموظف",
-      "companyName": "اسم الشركة",
-      "scNumber": "رقم SC",
-      "photo": "الصورة",
-      "uploadPhoto": "تحميل الصورة",
-      "employee": "الموظف",
-      "addEmployee": "إضافة موظف",
-      "generateBadges": "إنشاء باجات",
-      "allFieldsRequired": "جميع الحقول مطلوبة",
-      "createZIPSuccess": "تم إنشاء ملف ZIP بنجاح",
-      "createZIPFailed": "فشل إنشاء ملف ZIP",
-      "createZIPFailedDescription": "فشل إنشاء ملف ZIP",
-      "validation": {
-        "nameRequired": "اسم الموظف مطلوب",
-        "companyNameRequired": "اسم الشركة مطلوب",
-        "scNumberRequired": "رقم SC مطلوب",
-        "photoRequired": "الصورة مطلوبة",
-        "maxFileSize": "حجم الملف أقصى 10MB"
-      }
-    }
   }
 }

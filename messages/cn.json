@@ -4,7 +4,6 @@
     "whatLookingFor": "您在寻找什么？",
     "applyingForPersonalBadges": "申请个人证件",
     "applyingForVehicleBadges": "申请车辆证件",
-    "applyingForTemporaryBadges": "申请临时证件",
     "downloadExcelRegister": "下载 Excel 登记表",
     "renamePhotosNow": "立即重命名照片",
     "byPCHBadgingTeam": "@PCH 证件团队制作",
@@ -13,13 +12,10 @@
     "emailAddress": "contractor-badging@petrochina-hfy.com",
     "renamePhotosTool": "照片重命名工具",
     "home": "首页",
-    "comingSoon": "即将推出",
-    "comingSoonDescription": "该功能即将推出",
     "mobileNotSupported": "不支持移动设备",
     "pleaseUseComputer": "请使用电脑访问此应用程序",
     "personalBadges": "个人证件",
     "vehicleBadges": "车辆证件",
-    "tempBadges": "临时证件",
     "continueAnyway": "仍要继续",
     "draftFound": "您有未保存的内容，保存于 {when}。",
     "draftPhotosNotIncluded": "照片和文件不会被保存，需要重新上传。",
@@ -279,30 +275,5 @@
     "eaLetterNumber": "安全授权信函编号",
     "fleetNumber": "车辆的车队编号（如有）",
     "chassisNumber": "车辆的唯一底盘号"
-  },
-  "temporaryBadge": {
-    "title": "申请临时证件",
-    "description": "请填写员工详细信息并上传所需文件。整个过程完全在客户端进行，确保不会在我们的服务器上存储任何数据。完成后，请下载 ZIP 文件并连同必要的安全授权一起发送至提供的 PCH 证件办公室电子邮件地址。感谢您的配合。",
-    "form": {
-      "name": "员工名字",
-      "companyName": "公司名称",
-      "scNumber": "SC 编号",
-      "photo": "照片",
-      "uploadPhoto": "上传照片",
-      "employee": "员工",
-      "addEmployee": "添加员工",
-      "generateBadges": "生成证件",
-      "allFieldsRequired": "所有字段都是必填的",
-      "createZIPSuccess": "成功",
-      "createZIPFailed": "失败",
-      "createZIPFailedDescription": "ZIP 文件创建失败",
-      "validation": {
-        "nameRequired": "需要员工名字",
-        "companyNameRequired": "需要公司名称",
-        "scNumberRequired": "需要 SC 编号",
-        "photoRequired": "需要照片",
-        "maxFileSize": "文件大小最大为 10MB"
-      }
-    }
   }
 }

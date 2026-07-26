@@ -4,7 +4,6 @@
     "whatLookingFor": "What are you looking for?",
     "applyingForPersonalBadges": "Applying for Personal Badges",
     "applyingForVehicleBadges": "Applying for Vehicle Badges",
-    "applyingForTemporaryBadges": "Applying for Temporary Badges",
     "downloadExcelRegister": "Download the Excel register",
     "renamePhotosNow": "Rename your photos now",
     "byPCHBadgingTeam": "@By PCH Badging Team",
@@ -13,13 +12,10 @@
     "emailAddress": "contractor-badging@petrochina-hfy.com",
     "renamePhotosTool": "Rename photos tool",
     "home": "Home",
-    "comingSoon": "Coming Soon",
-    "comingSoonDescription": "This feature is coming soon",
     "mobileNotSupported": "Mobile Not Supported",
     "pleaseUseComputer": "Please use a computer to access this application.",
     "personalBadges": "Personal Badges",
     "vehicleBadges": "Vehicles Badges",
-    "tempBadges": "Temporary Badges",
     "continueAnyway": "Continue anyway",
     "draftFound": "You have unsaved work from {when}.",
     "draftPhotosNotIncluded": "Photos and documents are not saved and will need to be uploaded again.",
@@ -288,30 +284,5 @@
     "eaLetterNumber": "Security clearance letter number",
     "fleetNumber": "Fleet number for the vehicle (if applicable)",
     "chassisNumber": "Unique chassis number of the vehicle"
-  },
-  "temporaryBadge": {
-    "title": "Apply for Temporary Badges",
-    "description": "Generate temporary badges for your employees. The badges will expire at the end of the current month.",
-    "form": {
-      "name": "Employee Name",
-      "companyName": "Company Name",
-      "scNumber": "SC Number",
-      "photo": "Photo",
-      "uploadPhoto": "Upload Photo",
-      "employee": "Employee",
-      "addEmployee": "Add Employee",
-      "generateBadges": "Generate Badges",
-      "allFieldsRequired": "All fields are required",
-      "createZIPSuccess": "Success",
-      "createZIPSuccessDescription": "Temporary badges generated successfully",
-      "createZIPFailed": "Error",
-      "createZIPFailedDescription": "Failed to generate temporary badges",
-      "validation": {
-        "nameRequired": "Employee name is required",
-        "companyNameRequired": "Company name is required",
-        "scNumberRequired": "SC number is required",
-        "maxFileSize": "Maximum file size is 10MB"
-      }
-    }
   }
 }
