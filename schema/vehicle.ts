@@ -1,42 +1,77 @@
 import { z } from "zod";
 
-export const vehicleSchema = z.object({
-    plateNumber: z.string().min(1, "Plate number is required"),
-    make: z.string().min(2, "First name must be at least 2 characters"),
-    model: z.string().min(2, "Last name must be at least 2 characters"),
-    contractor: z.string().min(2, "Contractor must be at least 2 characters"),
-    senewiyahNumber: z.string().min(1, "Senewiyah Number is required"),
-    wakalaNumber: z.string().optional(),
-    softskinArmored: z.string().optional(),
-    province: z.string().min(2, "Province must be at least 2 characters"),
-    isVehicle: z.string().optional(),
-    relatedPersons: z.array(z.string()),
-    subcontractor: z.string().optional(),
+// Details that are identical for every vehicle in a request, so they are
+// captured once above the grid rather than repeated on every row.
+export const requestSchema = (t: any) =>
+  z.object({
+    contractor: z.string().min(2, t('validation.contractorRequired')),
     associatedPetroChinaContractNumber: z
       .string()
-      .min(1, "Associated PetroChina Contract Number is required"),
+      .min(1, t('validation.associatedPetroChinaContractNumberRequired')),
     contractHoldingPetroChinaDepartment: z
       .string()
-      .min(1, "Contract Holding PetroChina Department is required"),
-    eaLetterNumber: z.string().min(1, "EA Letter Number is required"),
-    numberInEaList: z.string().min(1, "Number in EA List is required"),
+      .min(1, t('validation.contractHoldingPetroChinaDepartmentRequired')),
+  });
+
+export const vehicleSchema = (t: any) =>
+  z.object({
+    plateNumber: z.string().min(1, t('validation.plateNumberRequired')),
+    province: z.string().min(2, t('validation.provinceRequired')),
+    make: z.string().min(2, t('validation.makeRequired')),
+    model: z.string().min(2, t('validation.modelRequired')),
+    softskinArmored: z.string().optional(),
+    senewiyahNumber: z.string().min(1, t('validation.senewiyahNumberRequired')),
+    wakalaNumber: z.string().optional(),
+    subcontractor: z.string().optional(),
+    // A comma separated list of driver badge numbers. Stored as text so it
+    // fits a single cell and round-trips through the sheet unchanged.
+    relatedPersons: z.string().optional(),
+    eaLetterNumber: z.string().min(1, t('validation.eaLetterNumberRequired')),
+    numberInEaList: z.string().min(1, t('validation.numberInEaListRequired')),
     securityClearanceExpiryDate: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Security clearance expiry date is required"),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, t('validation.securityClearanceExpiryDateRequired')),
     photo: z
       .instanceof(File)
-      .refine((file) => file.size <= 10000000, `Max file size is 10MB.`),
+      .refine((file) => file.size <= 10000000, t('validation.maxFileSize')),
     senewiyah: z
       .instanceof(File)
-      .refine((file) => file.size <= 10000000, `Max file size is 10MB.`),
-    wakala: z.instanceof(File).refine((file) => file.size <= 10000000, `Max file size is 10MB.`).optional(),
-    armoredVehicleCertificate: z.instanceof(File).refine((file) => file.size <= 10000000, `Max file size is 10MB.`).optional(),
-});
+      .refine((file) => file.size <= 10000000, t('validation.maxFileSize')),
+    wakala: z
+      .instanceof(File)
+      .refine((file) => file.size <= 10000000, t('validation.maxFileSize'))
+      .optional(),
+    armoredVehicleCertificate: z
+      .instanceof(File)
+      .refine((file) => file.size <= 10000000, t('validation.maxFileSize'))
+      .optional(),
+  });
 
-export const formSchema = z.object({
-    vehicles: z
-      .array(vehicleSchema)
-      .min(1, "At least one employee is required"),
-  }); 
+export const formSchema = (t: any) =>
+  requestSchema(t)
+    .extend({
+      vehicles: z
+        .array(vehicleSchema(t))
+        .min(1, t('validation.atLeastOneVehicleRequired')),
+    })
+    // Two vehicles in one request cannot share a plate number.
+    .superRefine((data, ctx) => {
+      const seen = new Map<string, number>();
+      data.vehicles.forEach((vehicle, index) => {
+        if (!vehicle.plateNumber) return;
+        if (seen.has(vehicle.plateNumber)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["vehicles", index, "plateNumber"],
+            message: t('validation.plateNumberDuplicate', {
+              row: (seen.get(vehicle.plateNumber) as number) + 1,
+            }),
+          });
+        } else {
+          seen.set(vehicle.plateNumber, index);
+        }
+      });
+    });
 
-export type FormValues = z.infer<typeof formSchema>;
+export type FormValues = z.infer<ReturnType<typeof formSchema>>;
+export type VehicleValues = FormValues["vehicles"][number];

@@ -1,33 +1,27 @@
 {
   "common": {
-    "appName": "PCH Badging Tools",
+    "appName": "Halfaya Badging Office",
     "whatLookingFor": "What are you looking for?",
     "applyingForPersonalBadges": "Applying for Personal Badges",
     "applyingForVehicleBadges": "Applying for Vehicle Badges",
     "downloadExcelRegister": "Download the Excel register",
-    "renamePhotosNow": "Rename your photos now",
     "byPCHBadgingTeam": "@By PCH Badging Team",
     "noUploadDisclaimer": "⚠️ No files or photos will be uploaded to our server or any other servers all the functions are working on the client side only",
     "email": "Email:",
     "emailAddress": "contractor-badging@petrochina-hfy.com",
-    "renamePhotosTool": "Rename photos tool",
     "home": "Home",
     "mobileNotSupported": "Mobile Not Supported",
     "pleaseUseComputer": "Please use a computer to access this application.",
     "personalBadges": "Personal Badges",
     "vehicleBadges": "Vehicles Badges",
     "continueAnyway": "Continue anyway",
-    "draftFound": "You have unsaved work from {when}.",
-    "draftPhotosNotIncluded": "Photos and documents are not saved and will need to be uploaded again.",
-    "draftRestore": "Restore",
-    "draftDiscard": "Discard",
-    "draftRestored": "Draft restored",
-    "draftRestoredDescription": "Your text entries are back. Please upload the photos and documents again.",
     "fixErrors": "Some details are missing",
     "fixErrorsDescription": "Check the highlighted tabs and fill in the required fields.",
     "generating": "Generating ZIP...",
     "copiedFromPrevious": "Company details copied from the previous entry",
-    "willBeWrittenAs": "Will be written as"
+    "willBeWrittenAs": "Will be written as",
+    "appShortName": "Badging",
+    "backToApplications": "Back to applications"
   },
   "header": {
     "home": "Home"
@@ -92,7 +86,9 @@
         "idDocumentRequired": "ID Document is required",
         "drivingLicenseRequired": "Driving License is required",
         "moiCardRequired": "MOI Card is required",
-        "securityClearanceExpiryDateRequired": "Security clearance expiry date is required"
+        "securityClearanceExpiryDateRequired": "Security clearance expiry date is required",
+        "badgeNumberDuplicate": "This badge number is already used by row {row}",
+        "badgeNumberFormat": "Badge number must be exactly 4 digits"
       },
       "securityClearanceExpiryDate": "Security Clearance Expiry Date"
     }
@@ -160,34 +156,12 @@
         "numberInEaListRequired": "Number in EA List is required",
         "photoRequired": "Vehicle photo is required",
         "senewiyahRequired": "Senewiyah document is required",
-        "maxFileSize": "Max file size is 10MB"
+        "maxFileSize": "Max file size is 10MB",
+        "securityClearanceExpiryDateRequired": "Security clearance expiry date is required",
+        "atLeastOneVehicleRequired": "At least one vehicle is required",
+        "plateNumberDuplicate": "This plate number is already used by row {row}"
       },
       "securityClearanceExpiryDate": "Security Clearance Expiry Date"
-    }
-  },
-  "renamePhotos": {
-    "title": "Photos Renaming Tool",
-    "common": {
-      "byPCHBadgingTeam": "@By PCH Badging Team",
-      "noUploadDisclaimer": "⚠️ No files or photos will be uploaded to our server or any other servers all the functions are working on the client side only"
-    },
-    "instructions": {
-      "title": "Excel file instructions",
-      "description": "This tool allows you to rename multiple photos at once",
-      "excelRequirements": "You will need to prepare an Excel file with the following columns: First Name, Last Name, and HFYC Number please see the example below:",
-      "downloadExcel": "Download the Excel register file",
-      "renamePhotosNow": "Rename your photos now"
-    },
-    "form": {
-      "selectImages": "Select Images",
-      "multipleImagesHint": "You can select multiple images",
-      "excelFile": "Excel file",
-      "excelFileHint": "Upload an Excel file with HFYC Number, First Name, and Last Name columns. please read the following instructions",
-      "here": "here"
-    },
-    "buttons": {
-      "generateZIP": "Generate ZIP",
-      "downloadRenamedImages": "Download Renamed Images as ZIP"
     }
   },
   "buttons": {
@@ -195,8 +169,7 @@
     "addEmployee": "Add Employee",
     "addVehicle": "Add Vehicle",
     "download": "Download",
-    "generateZIP": "Generate ZIP",
-    "downloadRenamedImages": "Download Renamed Images as ZIP"
+    "generateZIP": "Generate ZIP"
   },
   "validation": {
     "required": "This field is required",
@@ -265,8 +238,7 @@
   },
   "success": {
     "formSubmitted": "Form submitted successfully",
-    "zipGenerated": "ZIP file generated successfully",
-    "photosRenamed": "Photos renamed successfully"
+    "zipGenerated": "ZIP file generated successfully"
   },
   "confirmations": {
     "deleteEmployee": "Are you sure you want to delete this employee?",
@@ -284,5 +256,121 @@
     "eaLetterNumber": "Security clearance letter number",
     "fleetNumber": "Fleet number for the vehicle (if applicable)",
     "chassisNumber": "Unique chassis number of the vehicle"
+  },
+  "collaboration": {
+    "start": "Collaborate",
+    "startHint": "Start collaboration before uploading media; browser files cannot move into a shared room.",
+    "share": "Copy share link",
+    "copied": "Link copied",
+    "owner": "Owner · media & ZIP",
+    "editor": "Editor · text only",
+    "end": "End collaboration",
+    "leave": "Leave",
+    "endHint": "Close this shared room for everyone",
+    "leaveHint": "Leave this shared room",
+    "endConfirm": "End collaboration for everyone? The shared room will be permanently closed. Text will be saved as a local draft, but uploaded media must be attached again.",
+    "you": "you",
+    "error": "Collaboration is unavailable. Check the Vercel environment variables."
+  },
+  "grid": {
+    "person": "Person",
+    "identity": "Identity",
+    "contract": "Contract",
+    "clearance": "Clearance",
+    "documents": "Documents",
+    "employees": "Employees",
+    "photos": "Photos",
+    "needAttention": "Need attention",
+    "removeRow": "Remove this row",
+    "keyboardHint": "Tab moves across, Shift+Tab moves back",
+    "fixErrorsInGrid": "The highlighted cells need fixing before the ZIP can be generated.",
+    "employeeCount": "{count} employees",
+    "photoCount": "{count} photos",
+    "attentionCount": "{count} need attention",
+    "colBadge": "Badge no.",
+    "colFirstName": "First name",
+    "colLastName": "Last name",
+    "colPosition": "Position",
+    "colIdDocument": "ID document no.",
+    "colNationality": "Nationality",
+    "colSubcontractor": "Subcontractor",
+    "colEaLetter": "EA letter",
+    "colEaList": "EA list no.",
+    "colExpires": "Expires",
+    "colPhoto": "Photo",
+    "colId": "ID",
+    "colLicence": "Licence",
+    "colMoi": "MOI",
+    "colPlate": "Plate no.",
+    "colProvince": "Province",
+    "colMake": "Make",
+    "colModel": "Model",
+    "colArmored": "Armored",
+    "colSenewiyah": "Senewiyah",
+    "colWakala": "Wakala",
+    "colDrivers": "Driver badges",
+    "colVehiclePhoto": "Photo",
+    "colSenewiyahDoc": "Senewiyah",
+    "colWakalaDoc": "Wakala",
+    "colArmoredDoc": "Cert.",
+    "vehicle": "Vehicle",
+    "registration": "Registration",
+    "drivers": "Drivers",
+    "vehicleCount": "{count} vehicles",
+    "driversHint": "Comma separated, e.g. HFYC1234, HFYC5678",
+    "rowsReady": "ready",
+    "reqContractor": "Contractor",
+    "reqContract": "PCH contract no.",
+    "reqDepartment": "Holding department",
+    "menuCut": "Cut",
+    "menuCopy": "Copy",
+    "menuPaste": "Paste",
+    "menuClear": "Clear contents",
+    "menuInsertAbove": "Insert row above",
+    "menuInsertBelow": "Insert row below",
+    "menuDeleteRow": "Delete row",
+    "selectedCells": "{count} cells selected",
+    "requestDetails": "Request details",
+    "sheetHint": "Select cells and copy, or paste a block straight from Excel",
+    "contractorPlaceholder": "Contractor name",
+    "departmentPlaceholder": "Department",
+    "instructions": "Instructions",
+    "clientSideNote": "Nothing leaves your browser — files are built on this device.",
+    "allRowsReady": "All rows ready",
+    "rowCount": "{count, plural, one {# row} other {# rows}}",
+    "ownerOnlyZIP": "Only the sheet owner can generate the ZIP",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "savedTextOnly": "Saved, photos too large"
+  },
+  "documents": {
+    "title": "Your applications",
+    "subtitle": "{count} saved on this device",
+    "newPersonal": "New personal badge application",
+    "newVehicles": "New vehicle badge application",
+    "newPersonalHint": "One row per employee",
+    "newVehiclesHint": "One row per vehicle",
+    "emptyTitle": "No applications yet",
+    "emptyBody": "Start a badge application and it will be kept here on this device, so you can come back and finish it later.",
+    "untitled": "Untitled",
+    "employeeRows": "{count} employees",
+    "vehicleRows": "{count} vehicles",
+    "edited": "Edited {when}",
+    "delete": "Delete application",
+    "confirmDelete": "Delete",
+    "cancel": "Cancel",
+    "storageNote": "Applications are stored in this browser only. Clearing site data removes them.",
+    "subtitleEmpty": "Nothing saved on this device yet",
+    "colName": "Application",
+    "colContractor": "Contractor",
+    "colType": "Type",
+    "colRows": "Rows",
+    "colEdited": "Last edited",
+    "typePersonal": "Personal",
+    "typeVehicles": "Vehicles",
+    "photoShort": "{count} photos",
+    "newShort": "New application",
+    "collabHint": "Share any application and fill the sheet together, live.",
+    "collabHintShort": "Sheets can be filled together, live"
   }
 }

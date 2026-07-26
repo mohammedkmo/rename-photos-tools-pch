@@ -1,104 +1,107 @@
 'use client'
 
-import { Github, LanguagesIcon, Menu } from "lucide-react";
+import { ArrowLeft, Check, Github, Languages } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useRouter, usePathname } from "next/navigation";
-import { useTranslations } from 'next-intl';
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { HEADER_ACTION_SLOT, HEADER_DOC_SLOT } from "@/components/layout/HeaderPortal";
+
+const LANGUAGES = [
+    { code: 'en', name: 'English' },
+    { code: 'ar', name: 'العربية' },
+    { code: 'cn', name: '中文' },
+];
 
 export default function Header() {
     const locale = useLocale();
-    const router = useRouter();
     const pathname = usePathname();
     const t = useTranslations('common');
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const changeLanguage = (newLocale: string) => {
-        const currentPath = pathname.replace(`/${locale}`, '');
-        router.push(`/${newLocale}${currentPath}`);
-        window.location.href = `/${newLocale}${currentPath}`;
-    };
+    // A plain link reloads the document, which keeps next-intl's server-rendered
+    // messages in step with the locale in the URL.
+    const languageHref = (newLocale: string) =>
+        `/${newLocale}${pathname.replace(`/${locale}`, '')}`;
 
-    const languages = [
-        { code: 'en', name: 'English' },
-        { code: 'ar', name: 'العربية' },
-        { code: 'cn', name: '中文' }
-    ];
-
-    const NavLinks = () => (
-        <>
-            <Link href={`/${locale}`} className={`cursor-pointer ${pathname === `/${locale}` ? 'text-red-500 font-bold' : 'text-black'}`}>
-                <span className="text-sm">{t('home')}</span>
-            </Link>
-            <Link href={`/${locale}/personal`} className={`cursor-pointer ${pathname === `/${locale}/personal`? 'text-red-500 font-bold' : 'text-black'}`}>
-                <span className="text-sm">{t('personalBadges')}</span>
-            </Link>
-            <Link href={`/${locale}/vehicles`} className={`cursor-pointer ${pathname === `/${locale}/vehicles`? 'text-red-500 font-bold' : 'text-black'}`}>
-                <span className="text-sm">{t('vehicleBadges')}</span>
-            </Link>
-        </>
-    );
+    // A sheet is an open file, so it gets a way back rather than navigation.
+    const onSheet = pathname !== `/${locale}` && pathname !== `/${locale}/`;
 
     return (
-        <header className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-white/80 backdrop-blur-sm border rounded-full w-11/12 md:w-7/12">
-            <div className="container mx-auto flex items-center justify-between py-4 px-4 md:px-6">
-                <div className="flex items-center gap-x-4">
-                    <Link href={`/${locale}`} className="cursor-pointer">
-                        <Image src="/logo.png" alt="PCH Logo" width={80} height={80} className="w-24 md:w-28" />
-                    </Link>
-                    
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center gap-x-4">
-                        <NavLinks />
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <button 
-                        className="md:hidden"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        <header className={`flex-none h-14 flex items-center gap-2 px-4  ${onSheet ? 'bg-pch-ground' : 'bg-pch-surface'}`}>
+            {onSheet ? (
+                <>
+                    <Link
+                        href={`/${locale}`}
+                        title={t('backToApplications')}
+                        aria-label={t('backToApplications')}
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-pch-ink2 hover:bg-pch-subtle hover:text-pch-ink transition-colors"
                     >
-                        <Menu size={24} />
-                    </button>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="link" className="flex items-center gap-x-1">
-                                <span className="hidden md:inline">
-                                    {languages.find(lang => lang.code === locale)?.name || 'Language'}
-                                </span>
-                                <LanguagesIcon className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {languages.map((lang) => (
-                                <DropdownMenuItem key={lang.code} onSelect={() => changeLanguage(lang.code)}>
-                                    {lang.name}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <a href="https://github.com/mohammedkmo/hfyc" target="_blank" rel="noopener noreferrer" className="cursor-pointer">
-                        <div className="p-2 rounded-xl bg-slate-200">
-                            <Github size={18} className="text-black" />
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            {/* Mobile Navigation Menu */}
-            {isMenuOpen && (
-                <div className="md:hidden absolute bottom-full left-0 w-full bg-white/95 backdrop-blur-sm border rounded-t-2xl py-4 px-6 mb-2">
-                    <div className="flex flex-col space-y-4">
-                        <NavLinks />
-                    </div>
-                </div>
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                    </Link>
+                    {/* Document identity: which file is open and whether it is saved. */}
+                    <div id={HEADER_DOC_SLOT} className="flex items-center gap-2 min-w-0" />
+                </>
+            ) : (
+                <Link href={`/${locale}`} className="flex items-center gap-2.5 shrink-0 ps-1">
+                    <Image
+                        src="/logo.png"
+                        alt="PetroChina"
+                        width={132}
+                        height={19}
+                        priority
+                        className="h-[17px] w-auto"
+                    />
+                    <span className="hidden sm:inline text-[13px] font-medium text-pch-ink3 border-s border-pch-line2 ps-2.5">
+                        {t('appName')}
+                    </span>
+                </Link>
             )}
+
+            <div className="ms-auto flex items-center gap-1">
+                {/* Tools that act on the open file: sharing, help. */}
+                <div id={HEADER_ACTION_SLOT} className="flex items-center gap-1" />
+
+                {!onSheet && (
+
+<DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            type="button"
+                            className="h-8 px-2.5 inline-flex items-center gap-1.5 rounded-md text-[13px] font-medium text-pch-ink2 hover:bg-pch-subtle transition-colors"
+                        >
+                            <Languages className="h-4 w-4 text-pch-ink3" />
+                            <span className="hidden sm:inline">
+                                {LANGUAGES.find((lang) => lang.code === locale)?.name}
+                            </span>
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[9rem]">
+                        {LANGUAGES.map((lang) => (
+                            <DropdownMenuItem key={lang.code} asChild>
+                                <a href={languageHref(lang.code)} className="flex items-center justify-between">
+                                    {lang.name}
+                                    {lang.code === locale && <Check className="h-3.5 w-3.5 text-pch-accent" />}
+                                </a>
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                )}
+
+                
+
+                <a
+                    href="https://github.com/mohammedkmo/hfyc"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-8 w-8 inline-flex items-center justify-center rounded-md text-pch-ink3 hover:text-pch-ink hover:bg-pch-subtle transition-colors"
+                    aria-label="GitHub"
+                >
+                    <Github size={15} />
+                </a>
+            </div>
         </header>
     );
 }

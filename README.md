@@ -10,6 +10,9 @@ PCH Badging Tools is a Next.js application designed to streamline the process of
 - Apply for Vehicle Badges
 - Rename Photos Tool
 - Multi-language support (English, Arabic, Chinese)
+- Anonymous realtime collaboration with private share links
+- Live cursors, generated guest names, and local avatars
+- Owner-only media uploads and ZIP generation
 
 ## Getting Started
 
@@ -43,7 +46,29 @@ PCH Badging Tools is a Next.js application designed to streamline the process of
    ```
    the main reason for this is to send messages to a telegram chat from the application to let the badging office know that a new application has been submitted.
 
-   this tools collects no data from the user, all data is stored in the user's browser.
+   Media files stay in the sheet owner's browser. When collaboration is
+   enabled, text fields and media-presence flags are stored in a private
+   Liveblocks room so invited editors can work in realtime.
+
+### Realtime collaboration
+
+Collaboration uses Vercel for the application and secure API routes, and
+Liveblocks for realtime room storage and presence. Add these server-only values
+to `.env.local` and to **Vercel → Project Settings → Environment Variables**:
+
+```bash
+LIVEBLOCKS_SECRET_KEY=sk_...
+COLLABORATION_SECRET=...
+```
+
+Generate the second value with `openssl rand -base64 48`. Never expose either
+value through a `NEXT_PUBLIC_` variable.
+
+Rooms are private. The creator receives an HttpOnly owner cookie, while an
+invitation is exchanged for an HttpOnly editor cookie. Invitation tokens are
+put in the URL fragment so they are not sent in normal HTTP requests or Vercel
+request logs. Without accounts, owner access is tied to the browser that created
+the sheet and cannot be recovered on another device.
 
 ### Running the Application
 

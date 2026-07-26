@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import {  Rubik } from "next/font/google";
+import { Rubik } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "../globals.css";
 import Header from "@/components/layout/Header";
 import { NextIntlClientProvider } from 'next-intl';
@@ -12,6 +13,7 @@ import { Analytics } from '@vercel/analytics/react';
 const rubik = Rubik({
   subsets: ["latin", "arabic"],
   weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-arabic",
 });
 
 
@@ -32,12 +34,21 @@ export default async function RootLayout({
   const direction = getLangDir(locale);
 
   return (
-    <html lang={locale} dir={direction}>
-      <body className={rubik.className}>
+    <html
+      lang={locale}
+      dir={direction}
+      className={`${GeistSans.variable} ${rubik.variable}`}
+    >
+      <body className="bg-pch-ground text-pch-ink">
         <NextIntlClientProvider messages={messages}>
           <DeviceProvider>
-            <Header />
-            {children}
+            {/* A fixed height, not a minimum: the shell must bound its children
+                or their overflow-auto never engages and the page scrolls
+                instead of the sheet. */}
+            <div className="h-[100dvh] flex flex-col overflow-hidden">
+              <Header />
+              {children}
+            </div>
           </DeviceProvider>
         </NextIntlClientProvider>
         <Toaster />
