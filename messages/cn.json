@@ -18,7 +18,7 @@
     "mobileNotSupported": "不支持移动设备",
     "pleaseUseComputer": "请使用电脑访问此应用程序",
     "personalBadges": "个人证件",
-    "vehicleBadges": "车辆证件", 
+    "vehicleBadges": "车辆证件",
     "tempBadges": "临时证件"
   },
   "header": {
@@ -86,8 +86,10 @@
         "photoRequired": "需要照片",
         "idDocumentRequired": "需要身份证件",
         "drivingLicenseRequired": "需要驾驶证",
-        "moiCardRequired": "需要内政部卡"
-      }
+        "moiCardRequired": "需要内政部卡",
+        "securityClearanceExpiryDateRequired": "安全许可到期日期为必填项"
+      },
+      "securityClearanceExpiryDate": "安全许可到期日期"
     }
   },
   "vehiclesBadge": {
@@ -154,7 +156,8 @@
         "photoRequired": "需要车辆照片",
         "senewiyahRequired": "需要年检证",
         "maxFileSize": "文件大小最大为 10MB"
-      }
+      },
+      "securityClearanceExpiryDate": "安全许可到期日期"
     }
   },
   "renamePhotos": {
@@ -200,7 +203,8 @@
       "enterAssociatedPetroChinaContractNumber": "输入相关中石油合同编号",
       "enterContractHoldingPetroChinaDepartment": "输入持有合同的中石油部门",
       "enterEaLetterNumber": "输入 EA 信函编号",
-      "enterNumberInEaList": "输入 EA 清单中的编号"
+      "enterNumberInEaList": "输入 EA 清单中的编号",
+      "enterSecurityClearanceExpiryDate": "请选择该员工安全许可的到期日期"
     },
     "vehicle": {
       "enterPlateNumber": "输入车牌号码",
@@ -217,12 +221,13 @@
       "uploadWakala": "上传代理证（如有）",
       "uploadArmoredVehicleCertificate": "上传装甲车辆证书（如有）",
       "enterContractor": "输入承包商名称",
-      "enterCompanyName": "输入公司名称", 
+      "enterCompanyName": "输入公司名称",
       "enterSubcontractor": "输入分包商名称（如有）",
       "enterAssociatedPetroChinaContractNumber": "输入相关中石油合同编号",
       "enterContractHoldingPetroChinaDepartment": "输入持有合同的中石油部门",
       "enterEaLetterNumber": "输入 EA 信函编号",
-      "enterNumberInEaList": "输入 EA 清单中的编号"
+      "enterNumberInEaList": "输入 EA 清单中的编号",
+      "enterSecurityClearanceExpiryDate": "请选择该车辆安全许可的到期日期"
     },
     "company": {
       "enterContractor": "输入承包商名称",

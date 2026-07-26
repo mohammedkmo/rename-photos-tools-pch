@@ -36,7 +36,7 @@ import CustomFileUpload from "@/components/ui/customFileUpload";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from "xlsx-js-style";
-import { formatDate } from "@/lib/helpers";
+import { formatDate, formatExpiryDate, parseExpiryDate } from "@/lib/helpers";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -86,6 +86,7 @@ export default function VehiclesBadgeForm() {
       contractHoldingPetroChinaDepartment: "",
       eaLetterNumber: "",
       numberInEaList: "",
+      securityClearanceExpiryDate: "",
       photo: null as unknown as File,
       senewiyah: null as unknown as File,
       wakala: undefined,
@@ -154,7 +155,7 @@ export default function VehiclesBadgeForm() {
           "Last Name": vehicle.model,
           Department: `HALFAYA/Contractor/${vehicle.contractor}`,
           "Start Time of Effective Period": formatDate(new Date()),
-          "End Time of Effective Period": formatDate(new Date()),
+          "End Time of Effective Period": formatExpiryDate(vehicle.securityClearanceExpiryDate),
           "Enrollment Date": formatDate(new Date()),
           Type: "Basic Person",
           "Is Vehicle": "Yes",
@@ -252,217 +253,11 @@ export default function VehiclesBadgeForm() {
         excelBuffer
       );
 
-      const registerHeader = [
-        "Contractor Holding Direct PCH Contract",
-        "Subcontractor (Where Applicable)",
-        "Plate No.",
-        "Province",
-        "Make",
-        "Model",
-        "Armored / Softskin",
-        "Senewiyah No.",
-        "Wakala No.",
-        "Issue Date",
-        "Expiry Date",
-        "Driver 1",
-        "Driver 2",
-        "Driver 3",
-        "Driver 4",
-        "Driver 5",
-        "Driver 6",
-        "Driver 7",
-        "Driver 8",
-        "Driver 9",
-        "Driver 10",
-        "Driver 11",
-        "Driver 12",
-        "Driver 13",
-        "Driver 14",
-        "Driver 15",
-        "Driver 16",
-        "Driver 17",
-        "Driver 18",
-        "Driver 19",
-        "Driver 20",
-        "EA Letter Number",
-        "Comments",
-      ];
-
-      const excelDataValues = excelData.map((data, index) => {
-        return {
-          "Contractor Holding Direct PCH Contract": data["Company Name"],
-          "Subcontractor (Where Applicable)": data["Subcontractor Name"],
-          "Plate No.": data.ID,
-          Province: data.Province,
-          Make: data["First Name"],
-          Model: data["Last Name"],
-          "Armored / Softskin": data["ArmoredSoftskin"],
-          "Senewiyah No.": data["ID Document Number"],
-          "Wakala No.": data["Wakala Number"],
-          "Issue Date": formatDate(new Date()),
-          "Expiry Date": formatDate(new Date()),
-          "Driver 1": data["Related Persons"]
-            ? data["Related Persons"].split(",")[0]
-            : "",
-          "Driver 2": data["Related Persons"]
-            ? data["Related Persons"].split(",")[1]
-            : "",
-          "Driver 3": data["Related Persons"]
-            ? data["Related Persons"].split(",")[2]
-            : "",
-          "Driver 4": data["Related Persons"]
-            ? data["Related Persons"].split(",")[3]
-            : "",
-          "Driver 5": data["Related Persons"]
-            ? data["Related Persons"].split(",")[4]
-            : "",
-          "Driver 6": data["Related Persons"]
-            ? data["Related Persons"].split(",")[5]
-            : "",
-          "Driver 7": data["Related Persons"]
-            ? data["Related Persons"].split(",")[6]
-            : "",
-          "Driver 8": data["Related Persons"]
-            ? data["Related Persons"].split(",")[7]
-            : "",
-          "Driver 9": data["Related Persons"]
-            ? data["Related Persons"].split(",")[8]
-            : "",
-          "Driver 10": data["Related Persons"]
-            ? data["Related Persons"].split(",")[9]
-            : "",
-          "Driver 11": data["Related Persons"]
-            ? data["Related Persons"].split(",")[10]
-            : "",
-          "Driver 12": data["Related Persons"]
-            ? data["Related Persons"].split(",")[11]
-            : "",
-          "Driver 13": data["Related Persons"]
-            ? data["Related Persons"].split(",")[12]
-            : "",
-          "Driver 14": data["Related Persons"]
-            ? data["Related Persons"].split(",")[13]
-            : "",
-          "Driver 15": data["Related Persons"]
-            ? data["Related Persons"].split(",")[14]
-            : "",
-          "Driver 16": data["Related Persons"]
-            ? data["Related Persons"].split(",")[15]
-            : "",
-          "Driver 17": data["Related Persons"]
-            ? data["Related Persons"].split(",")[16]
-            : "",
-          "Driver 18": data["Related Persons"]
-            ? data["Related Persons"].split(",")[17]
-            : "",
-          "Driver 19": data["Related Persons"]
-            ? data["Related Persons"].split(",")[18]
-            : "",
-          "Driver 20": data["Related Persons"]
-            ? data["Related Persons"].split(",")[19]
-            : "",
-          "EA Letter Number": data["EA Letter Number"],
-          Comments: "",
-        };
-      });
-
-      const combinedRegisterData = [
-        registerHeader,
-        ...excelDataValues.map(Object.values),
-      ];
-
-      const registerWorksheet = XLSX.utils.aoa_to_sheet(combinedRegisterData);
-
-      const registerColWidths = registerHeader.map((header) => ({
-        wch: header.length + 10,
-      }));
-
-      registerWorksheet["!cols"] = registerColWidths;
-
-      const headerStyle = {
-        font: {
-          name: "Calibri",
-          sz: 14,
-          bold: true,
-          color: { rgb: "000000" },
-        },
-        alignment: {
-          vertical: "center",
-          horizontal: "center",
-        },
-        height: 24,
-        fill: {
-          fgColor: { rgb: "D3D3D3" }, // Light gray background
-        },
-        border: {
-          top: { style: "thin", color: { rgb: "000000" } },
-          bottom: { style: "thin", color: { rgb: "000000" } },
-          left: { style: "thin", color: { rgb: "000000" } },
-          right: { style: "thin", color: { rgb: "000000" } },
-        },
-      };
-
-      const rowStyle = {
-        font: {
-          name: "Calibri",
-          sz: 14,
-          color: { rgb: "000000" },
-        },
-        alignment: {
-          vertical: "center",
-          horizontal: "center",
-        },
-        height: 20,
-        border: {
-          top: { style: "thin", color: { rgb: "000000" } },
-          bottom: { style: "thin", color: { rgb: "000000" } },
-          left: { style: "thin", color: { rgb: "000000" } },
-          right: { style: "thin", color: { rgb: "000000" } },
-        },
-      };
-
-      // Apply styles to header row
-      registerHeader.forEach((header, colIndex) => {
-        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
-        if (!registerWorksheet[cellAddress])
-          registerWorksheet[cellAddress] = { v: header };
-        registerWorksheet[cellAddress].s = headerStyle;
-      });
-
-      // Apply border styles to all cells
-      for (let R = 1; R < combinedRegisterData.length; R++) {
-        for (let C = 0; C < registerHeader.length; C++) {
-          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-          if (!registerWorksheet[cellAddress])
-            registerWorksheet[cellAddress] = {
-              v: combinedRegisterData[R][C] || "",
-            };
-          registerWorksheet[cellAddress].s = rowStyle;
-        }
-      }
-
-      const registerWorkbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(
-        registerWorkbook,
-        registerWorksheet,
-        "Register"
-      );
-      const registerBuffer = XLSX.write(registerWorkbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      // Add Excel file to ZIP
-      zip.file(
-        `${excelData[0]["Company Name"]} - ${excelData.length} vehicles register.xlsx`,
-        registerBuffer
-      );
-
       // Generate ZIP file and trigger download
       const zipBlob = await zip.generateAsync({ type: "blob" });
       saveAs(
         zipBlob,
-        `${excelData[0]["Company Name"]} - ${excelData.length} vehicles register.zip`
+        `${excelData[0]["Company Name"]} - ${excelData.length} vehicles request.zip`
       );
 
       toast({
@@ -519,19 +314,6 @@ export default function VehiclesBadgeForm() {
           return;
         }
 
-         // Find the Excel file
-        const registerFile = Object.values(contents.files).find((f) =>
-          f.name.endsWith("register.xlsx")
-        );
-        if (!registerFile) {
-          toast({
-            title: "Error",
-            description: "No Excel file found in the ZIP",
-            variant: "destructive",
-          });
-          return;
-        }
-
         // Read Excel data
         const excelData = await excelFile.async("arraybuffer");
         const workbook = XLSX.read(excelData, { type: "array" });
@@ -539,21 +321,11 @@ export default function VehiclesBadgeForm() {
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        // Read Register Excel data
-        const registerExcelData = await registerFile.async("arraybuffer");
-        const registerWorkbook = XLSX.read(registerExcelData, { type: "array" });
-        const registerFirstSheetName = registerWorkbook.SheetNames[0];
-        const registerWorksheet = registerWorkbook.Sheets[registerFirstSheetName];
-        const registerJsonData = XLSX.utils.sheet_to_json(registerWorksheet, { header: 1 });
-
         // Skip header rows
         const dataRows = jsonData.slice(10);
-        const registerDataRows = registerJsonData.slice(1);
-
-        const wakalaNumber = registerDataRows.map((row: any) => row[8]);
 
         // Map Excel data to form fields and process images
-        const vehicles = await Promise.all(dataRows.map(async (row: any, index: number) => {
+        const vehicles = await Promise.all(dataRows.map(async (row: any) => {
             const plateNumber = row[0];
             const make = row[1];
             const model = row[2];
@@ -577,8 +349,11 @@ export default function VehiclesBadgeForm() {
               contractHoldingPetroChinaDepartment: row[15],
               eaLetterNumber: row[17],
               numberInEaList: row[18],
-              softskinArmored: row[3],
-              wakalaNumber: wakalaNumber[index].toString(),
+              securityClearanceExpiryDate: parseExpiryDate(row[5]),
+              // Armored/Softskin and the Wakala number are not part of the
+              // access control template, so they cannot be restored from it.
+              softskinArmored: "",
+              wakalaNumber: "",
               photo: photoFile
                 ? new File([await photoFile.async("blob")], photoFile.name, {
                     type: "image/jpeg",
@@ -999,7 +774,7 @@ export default function VehiclesBadgeForm() {
                             )}
                           />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                           <FormField
                             control={form.control}
                             name={`vehicles.${index}.eaLetterNumber`}
@@ -1031,6 +806,24 @@ export default function VehiclesBadgeForm() {
                                 </FormControl>
                                 <FormDescription>
                                   {formDescriptions("enterNumberInEaList")}
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`vehicles.${index}.securityClearanceExpiryDate`}
+                            render={({ field }: { field: any }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  {formTranslations("securityClearanceExpiryDate")}
+                                </FormLabel>
+                                <FormControl>
+                                  <Input type="date" dir="ltr" {...field} value={field.value ?? ""} />
+                                </FormControl>
+                                <FormDescription>
+                                  {formDescriptions("enterSecurityClearanceExpiryDate")}
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>

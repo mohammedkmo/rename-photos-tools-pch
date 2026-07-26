@@ -30,7 +30,7 @@ import CustomFileUpload from "@/components/ui/customFileUpload";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from 'xlsx-js-style';
-import { formatDate } from "@/lib/helpers";
+import { formatDate, formatExpiryDate, parseExpiryDate } from "@/lib/helpers";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -75,6 +75,7 @@ export default function PersonalBadgeForm() {
             contractHoldingPetroChinaDepartment: "",
             eaLetterNumber: "",
             numberInEaList: "",
+            securityClearanceExpiryDate: "",
             photo: null as unknown as File,
             idDocument: null as unknown as File,
             drivingLicense: undefined,
@@ -137,7 +138,7 @@ export default function PersonalBadgeForm() {
                 "Last Name": employee.lastName,
                 "Department": `HALFAYA/Contractor/${employee.contractor}`,
                 "Start Time of Effective Period": formatDate(new Date()),
-                "End Time of Effective Period": formatDate(new Date()),
+                "End Time of Effective Period": formatExpiryDate(employee.securityClearanceExpiryDate),
                 "Enrollment Date": formatDate(new Date()),
                 "Type": "Basic Person",
                 "Company Name": employee.contractor,
@@ -214,130 +215,9 @@ export default function PersonalBadgeForm() {
         // Add Excel file to ZIP
         zip.file(`${excelData[0]["Company Name"]} - ${excelData.length} employees request.xlsx`, excelBuffer);
 
-
-        // Register excel file
-
-        const registerHeader = [
-            "",
-            "First Name",
-            "Last Name(s)",
-            "ID Document Number",
-            "Nationality",
-            "Badge Number",
-            "POSITION",
-            "Contractor (Holding Direct PCH Contract)",
-            "Subcontractor (Where Applicable)",
-            "Associated PetroChina Contract Number",
-            "Contract Holding PetroChina Department",
-            "Issue Date",
-            "Expiry Date",
-            "Comments (Security Department Only)",
-            "EA Letter Number",
-            "Number in EA List",
-            "Sponsor Badge",
-            "Access Revoked"]
-
-        const excelDataValues = excelData.map((data, index) => {
-            return {
-                "": index + 1,
-                "First Name": data["First Name"],
-                "Last Name(s)": data["Last Name"],
-                "ID Document Number": data["ID Document Number"],
-                "Nationality": data["Nationality"],
-                "Badge Number": data.ID.replace(/(\w{4})(\d{4})/, '$1-$2'),
-                "POSITION": data["Position-"],
-                "Contractor (Holding Direct PCH Contract)": data["Company Name"],
-                "Subcontractor (Where Applicable)": data["Subcontractor Name"],
-                "Associated PetroChina Contract Number": data["Associated PCH Contract Number"],
-                "Contract Holding PetroChina Department": data["Contract Holding PCH Department"],
-                "Issue Date": formatDate(new Date()),
-                "Expiry Date": formatDate(new Date()),
-                "Comments (Security Department Only)": "",
-                "EA Letter Number": data["EA Letter Number"],
-                "Number in EA List": data["Number in EA List"],
-                "Sponsor Badge": "NO",
-                "Access Revoked": "NO"
-            }
-        })
-
-        const combinedRegisterData = [registerHeader, ...excelDataValues.map(Object.values)];
-
-        const registerWorksheet = XLSX.utils.aoa_to_sheet(combinedRegisterData);
-
-        const registerColWidths = registerHeader.map(header => ({ wch: header.length + 10 }));
-
-        registerWorksheet['!cols'] = registerColWidths;
-
-        const headerStyle = {
-            font: {
-                name: "Calibri",
-                sz: 14,
-                bold: true,
-                color: { rgb: "000000" }
-            },
-            alignment: {
-                vertical: "center",
-                horizontal: "center"
-            },
-            height: 24,
-            fill: {
-                fgColor: { rgb: "D3D3D3" } // Light gray background
-            },
-            border: {
-                top: { style: "thin", color: { rgb: "000000" } },
-                bottom: { style: "thin", color: { rgb: "000000" } },
-                left: { style: "thin", color: { rgb: "000000" } },
-                right: { style: "thin", color: { rgb: "000000" } }
-            }
-        };
-
-        const rowStyle = {
-            font: {
-                name: "Calibri",
-                sz: 14,
-                color: { rgb: "000000" }
-            },
-            alignment: {
-                vertical: "center",
-                horizontal: "center"
-            },
-            height: 20,
-            border: {
-                top: { style: "thin", color: { rgb: "000000" } },
-                bottom: { style: "thin", color: { rgb: "000000" } },
-                left: { style: "thin", color: { rgb: "000000" } },
-                right: { style: "thin", color: { rgb: "000000" } }
-            }
-        };
-
-        // Apply styles to header row
-        registerHeader.forEach((header, colIndex) => {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
-            if (!registerWorksheet[cellAddress]) registerWorksheet[cellAddress] = { v: header };
-            registerWorksheet[cellAddress].s = headerStyle;
-        });
-
-        // Apply border styles to all cells
-        for (let R = 1; R < combinedRegisterData.length; R++) {
-            for (let C = 0; C < registerHeader.length; C++) {
-                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-                if (!registerWorksheet[cellAddress]) registerWorksheet[cellAddress] = { v: combinedRegisterData[R][C] || "" };
-                registerWorksheet[cellAddress].s = rowStyle;
-            }
-        }
-
-        const registerWorkbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(registerWorkbook, registerWorksheet, "Register");
-        const registerBuffer = XLSX.write(registerWorkbook, {
-            bookType: "xlsx",
-            type: "array",
-        });
-
-        zip.file(`${excelData[0]["Company Name"]} Register.xlsx`, registerBuffer);
-
         // Generate ZIP file and trigger download
         const zipBlob = await zip.generateAsync({ type: "blob" });
-        saveAs(zipBlob, `${excelData[0]["Company Name"]} - ${excelData.length} employees register.zip`);
+        saveAs(zipBlob, `${excelData[0]["Company Name"]} - ${excelData.length} employees request.zip`);
 
         toast({ 
             title: formTranslations('createZIPSuccess'), 
@@ -412,6 +292,7 @@ export default function PersonalBadgeForm() {
                         contractHoldingPetroChinaDepartment: row[13],
                         eaLetterNumber: row[15],
                         numberInEaList: row[16],
+                        securityClearanceExpiryDate: parseExpiryDate(row[5]),
                         photo: photoFile ? new File([await photoFile.async('blob')], photoFile.name, { type: 'image/jpeg' }) : null,
                         idDocument: idDocFile ? new File([await idDocFile.async('blob')], idDocFile.name, { type: 'image/jpeg' }) : null,
                         drivingLicense: drivingLicenseFile ? new File([await drivingLicenseFile.async('blob')], drivingLicenseFile.name, { type: 'image/jpeg' }) : undefined,
@@ -726,7 +607,7 @@ export default function PersonalBadgeForm() {
                                                         )}
                                                     />
                                                 </div>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                                     <FormField
                                                         control={form.control}
                                                         name={`employees.${index}.eaLetterNumber`}
@@ -754,6 +635,22 @@ export default function PersonalBadgeForm() {
                                                                 </FormControl>
                                                                 <FormDescription>
                                                                     {formDescriptions('enterNumberInEaList')}
+                                                                </FormDescription>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`employees.${index}.securityClearanceExpiryDate`}
+                                                        render={({ field }: { field: any }) => (
+                                                            <FormItem>
+                                                                <FormLabel>{formTranslations('securityClearanceExpiryDate')}</FormLabel>
+                                                                <FormControl>
+                                                                    <Input type="date" dir="ltr" {...field} value={field.value ?? ""} />
+                                                                </FormControl>
+                                                                <FormDescription>
+                                                                    {formDescriptions('enterSecurityClearanceExpiryDate')}
                                                                 </FormDescription>
                                                                 <FormMessage />
                                                             </FormItem>

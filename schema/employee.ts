@@ -19,6 +19,9 @@ export const employeeSchema = (t: any) => z.object({
       .min(1, t('validation.contractHoldingPetroChinaDepartmentRequired')),
     eaLetterNumber: z.string().min(1, t('validation.eaLetterNumberRequired')),
     numberInEaList: z.string().min(1, t('validation.numberInEaListRequired')),
+    securityClearanceExpiryDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, t('validation.securityClearanceExpiryDateRequired')),
     photo: z
       .instanceof(File)
       .refine((file) => file.size <= 10000000, t('validation.maxFileSize')),

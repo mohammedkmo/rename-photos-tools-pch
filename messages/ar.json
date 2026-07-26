@@ -85,8 +85,10 @@
         "atLeastOneEmployeeRequired": "يجب عليك إضافة على الأقل موظف واحد",
         "photoRequired": "صورة الموظف مطلوبة",
         "idDocumentRequired": "وثيقة هوية الموظف مطلوبة",
-        "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً"
-      }
+        "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً",
+        "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب"
+      },
+      "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
   },
   "vehiclesBadge": {
@@ -134,7 +136,7 @@
       "createZIPFailedDescription": "فشل انشاء ملف ZIP",
       "generateZIP": "إنشاء ZIP",
       "noHFYCNumberAddedYet": "لم يتم إضافة رقم HFYC بعد",
-      "enterHFYCNumber" : "اكتب رقم HFYC واضغط Enter (مثال: HFYC0001)",
+      "enterHFYCNumber": "اكتب رقم HFYC واضغط Enter (مثال: HFYC0001)",
       "softskinArmored": "نوع المركبة",
       "wakalaNumber": "رقم الوكالة",
       "armored": "مركبة مدرعة",
@@ -153,7 +155,8 @@
         "photoRequired": "صورة المركبة مطلوبة",
         "senewiyahRequired": "وثيقة السنوية مطلوبة",
         "maxFileSize": "الحد الأقصى لحجم الملف هو 10 ميجابايت"
-      }
+      },
+      "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
   },
   "renamePhotos": {
@@ -178,7 +181,7 @@
       "excelFileHint": "قم بتحميل ملف Excel يحتوي على أعمدة رقم HFYC والاسم الأول واسم العائلة. يرجى قراءة التعليمات التالية",
       "here": "هنا"
     },
-    "buttons":{
+    "buttons": {
       "generateZIP": "إنشاء ZIP"
     }
   },
@@ -202,7 +205,8 @@
       "enterAssociatedPetroChinaContractNumber": "أدخل رقم عقد بتروتشاينا المرتبط",
       "enterContractHoldingPetroChinaDepartment": "أدخل قسم بتروتشاينا الحامل للعقد",
       "enterEaLetterNumber": "أدخل رقم خطاب EA",
-      "enterNumberInEaList": "أدخل الرقم في قائمة EA"
+      "enterNumberInEaList": "أدخل الرقم في قائمة EA",
+      "enterSecurityClearanceExpiryDate": "اختر تاريخ انتهاء الموافقة الأمنية للموظف"
     },
     "vehicle": {
       "enterPlateNumber": "أدخل رقم اللوحة",
@@ -224,7 +228,8 @@
       "enterAssociatedPetroChinaContractNumber": "أدخل رقم عقد بتروتشاينا المرتبط",
       "enterContractHoldingPetroChinaDepartment": "أدخل قسم بتروتشاينا الحامل للعقد",
       "enterEaLetterNumber": "أدخل رقم خطاب EA",
-      "enterNumberInEaList": "أدخل الرقم في قائمة EA"
+      "enterNumberInEaList": "أدخل الرقم في قائمة EA",
+      "enterSecurityClearanceExpiryDate": "اختر تاريخ انتهاء الموافقة الأمنية للمركبة"
     },
     "company": {
       "enterContractor": "أدخل اسم المقاول",
