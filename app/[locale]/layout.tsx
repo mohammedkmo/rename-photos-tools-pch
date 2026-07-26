@@ -36,7 +36,10 @@ export default async function RootLayout({
       <body className={`${rubik.className} bg-pch-ground text-pch-ink`}>
         <NextIntlClientProvider messages={messages}>
           <DeviceProvider>
-            <div className="min-h-screen flex flex-col">
+            {/* A fixed height, not a minimum: the shell must bound its children
+                or their overflow-auto never engages and the page scrolls
+                instead of the sheet. */}
+            <div className="h-[100dvh] flex flex-col overflow-hidden">
               <Header />
               {children}
             </div>

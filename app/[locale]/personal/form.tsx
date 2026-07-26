@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, useWatch, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, type FieldErrors } from "react-hook-form";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from "xlsx-js-style";
-import { Loader2, Plus, RotateCcw, X } from "lucide-react";
+import { Building2, FileText, Plus, RotateCcw, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { FormValues, EmployeeValues, formSchema } from "@/schema/employee";
@@ -16,7 +16,12 @@ import { toJpeg } from "@/lib/images";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import DocumentCell from "@/components/grid/DocumentCell";
+import { TextCell, SelectCell, DateCell, DocumentTd } from "@/components/grid/cells";
+import SheetContextMenu from "@/components/grid/SheetContextMenu";
+import RequestHeader from "@/components/grid/RequestHeader";
+import InstructionsPopover from "@/components/grid/InstructionsPopover";
+import SheetFooter from "@/components/grid/SheetFooter";
+import { useSheet } from "@/hooks/use-sheet";
 
 const DRAFT_KEY = "hfyc:draft:personal";
 
@@ -47,6 +52,15 @@ const COLUMN_WIDTHS = [
   "4.5%", "4.5%", "4.5%", "4.5%",
 ];
 
+// Column order for the selection layer. `null` marks a column the clipboard
+// cannot fill, because its value is a file rather than text.
+const COLUMN_KEYS: (keyof EmployeeValues | null)[] = [
+  "id", "firstName", "lastName", "position",
+  "idDocumentNumber", "nationality", "subcontractor",
+  "eaLetterNumber", "numberInEaList", "securityClearanceExpiryDate",
+  null, null, null, null,
+];
+
 const REQUIRED_TEXT_FIELDS = [
   "id", "firstName", "lastName", "position",
   "idDocumentNumber", "nationality", "eaLetterNumber",
@@ -65,6 +79,7 @@ export default function PersonalBadgeForm() {
   const locale = useLocale();
   const formTranslations = useTranslations("personalBadge.form");
   const gridTranslations = useTranslations("grid");
+  const pageTranslations = useTranslations("personalBadge");
   const commonTranslations = useTranslations("common");
 
   const form = useForm<FormValues>({
@@ -78,10 +93,32 @@ export default function PersonalBadgeForm() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({ name: "employees", control: form.control });
+  const { fields, append, insert, remove } = useFieldArray({ name: "employees", control: form.control });
   const employees = useWatch({ control: form.control, name: "employees" });
+  const shared = useWatch({
+    control: form.control,
+    name: ["contractor", "associatedPetroChinaContractNumber", "contractHoldingPetroChinaDepartment"],
+  });
   const { errors, isSubmitting } = form.formState;
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const sheet = useSheet({
+    rowCount: fields.length,
+    columnKeys: COLUMN_KEYS as (string | null)[],
+    readCell: (row, col) =>
+      String(form.getValues(`employees.${row}.${COLUMN_KEYS[col]}` as any) ?? ""),
+    writeCell: (row, col, value) =>
+      form.setValue(`employees.${row}.${COLUMN_KEYS[col]}` as any, value, {
+        shouldDirty: true,
+        shouldValidate: true,
+      }),
+    ensureRows: (count) => {
+      const missing = count - form.getValues("employees").length;
+      if (missing > 0) append(Array.from({ length: missing }, () => ({ ...EMPTY_EMPLOYEE })));
+    },
+    insertRow: (at) => insert(at, { ...EMPTY_EMPLOYEE }),
+    deleteRow: (at) => remove(at),
+  });
 
   const { draft, save: saveDraft, clear: clearDraft, dismiss: dismissDraft } =
     useFormDraft<FormValues>(DRAFT_KEY);
@@ -241,109 +278,31 @@ export default function PersonalBadgeForm() {
   };
 
   // ── cell helpers ────────────────────────────────────────────────────────
-  const cellClass = (invalid?: boolean) =>
-    cn(
-      "w-full h-full px-3 bg-transparent text-[13.5px] text-pch-ink outline-none",
-      "focus:bg-pch-accentSoft focus:ring-2 focus:ring-inset focus:ring-pch-accent",
-      invalid && "bg-pch-stopBg text-pch-stopInk font-medium"
-    );
+  // The cell components themselves live in components/grid/cells.tsx. Declaring
+  // them here would make them a new component type on every render, which
+  // remounts the input and loses focus after a single keystroke.
+  // Everything the selection layer needs for one cell.
+  const cell = (row: number, col: number) => ({
+    row, col,
+    selected: sheet.isSelected(row, col),
+    anchor: sheet.isAnchor(row, col),
+    ...sheet.cellHandlers(row, col),
+  });
 
-  const TextCell = ({
-    index, name, mono, placeholder,
-  }: { index: number; name: keyof EmployeeValues; mono?: boolean; placeholder?: string }) => {
-    const invalid = Boolean((errors.employees?.[index] as any)?.[name]);
-    const message = (errors.employees?.[index] as any)?.[name]?.message as string | undefined;
-    return (
-      <td
-        className="p-0 border-b border-e border-pch-line h-11"
-        data-invalid={invalid || undefined}
-        title={message}
-      >
-        <input
-          {...form.register(`employees.${index}.${name}` as const)}
-          placeholder={placeholder}
-          className={cn(cellClass(invalid), mono && "font-mono text-[12.5px] tabular-nums")}
-        />
-      </td>
-    );
+  const cellError = (index: number, name: string) => {
+    const error = (errors.employees?.[index] as any)?.[name];
+    return { invalid: Boolean(error), message: error?.message as string | undefined };
   };
 
-  const DocCell = ({
-    index, name, label, required,
-  }: { index: number; name: "photo" | "idDocument" | "drivingLicense" | "moiCard"; label: string; required?: boolean }) => {
-    const invalid = Boolean((errors.employees?.[index] as any)?.[name]);
-    return (
-      <td className="p-0 border-b border-e border-pch-line h-11" data-invalid={invalid || undefined}>
-        <Controller
-          control={form.control}
-          name={`employees.${index}.${name}` as const}
-          render={({ field }) => (
-            <DocumentCell
-              value={field.value as File | undefined}
-              onChange={(file) => field.onChange(file ?? undefined)}
-              label={label}
-              required={required}
-              invalid={invalid}
-            />
-          )}
-        />
-      </td>
-    );
-  };
-
-  // Short labels kept on one line: a wrapping header row would push the grid
-  // down and make the two sticky offsets drift apart.
   const headerCell = (label: string, required?: boolean) => (
     <th
       title={label}
-      className="h-9 px-3 text-start text-[12px] font-semibold text-pch-ink2 bg-pch-surface border-b border-pch-line2 border-e border-e-pch-line sticky top-[30px] z-10 whitespace-nowrap overflow-hidden text-ellipsis"
+      className="h-9 px-3 text-start text-[11.5px] font-semibold text-pch-ink2 bg-pch-subtle border-b border-e border-pch-line2 sticky top-0 z-20 whitespace-nowrap overflow-hidden text-ellipsis"
     >
       {label}
-      {required && <span className="text-pch-stopInk ms-0.5 font-normal">*</span>}
+      {required && <span className="text-pch-stopEdge ms-0.5 font-normal">*</span>}
     </th>
   );
-
-  const groupCell = (label: string, span: number, accent?: boolean) => (
-    <th
-      colSpan={span}
-      className={cn(
-        "h-[30px] px-3 text-start text-[10.5px] font-semibold uppercase tracking-[0.08em] bg-pch-subtle border-b border-pch-line sticky top-0 z-10",
-        accent ? "text-pch-accentInk" : "text-pch-ink3"
-      )}
-    >
-      {label}
-    </th>
-  );
-
-  const requestField = (
-    name: "contractor" | "associatedPetroChinaContractNumber" | "contractHoldingPetroChinaDepartment",
-    label: string,
-    width: string,
-    mono?: boolean
-  ) => {
-    const invalid = Boolean(errors[name]);
-    return (
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-semibold uppercase tracking-[0.04em] text-pch-ink3">
-          {label}
-        </label>
-        <input
-          {...form.register(name)}
-          data-invalid={invalid || undefined}
-          className={cn(
-            "h-10 rounded-md border px-3 text-[14px] font-medium text-pch-ink bg-pch-surface shadow-sm",
-            "focus:outline-none focus:border-pch-accent focus:ring-[3px] focus:ring-pch-accent/20",
-            mono && "font-mono text-[13px] tabular-nums",
-            width,
-            invalid ? "border-pch-stopEdge" : "border-pch-line2"
-          )}
-        />
-        {invalid && (
-          <span className="text-[11.5px] text-pch-stopInk">{errors[name]?.message as string}</span>
-        )}
-      </div>
-    );
-  };
 
   return (
     <form
@@ -376,63 +335,54 @@ export default function PersonalBadgeForm() {
         </div>
       )}
 
-      {/* Shared details — the same for every row, so typed once */}
-      <div className="flex-none flex flex-wrap items-end gap-6 px-5 py-4 bg-pch-surface border-b border-pch-line">
-        {requestField("contractor", formTranslations("contractorName"), "min-w-[300px]")}
-        {requestField("associatedPetroChinaContractNumber", formTranslations("associatedPetroChinaContractNumber"), "min-w-[190px]", true)}
-        {requestField("contractHoldingPetroChinaDepartment", formTranslations("contractHoldingPetroChinaDepartment"), "min-w-[190px]")}
+      <RequestHeader
+        title={{
+          registration: form.register("contractor"),
+          value: shared[0] ?? "",
+          placeholder: gridTranslations("contractorPlaceholder"),
+          error: errors.contractor?.message as string | undefined,
+        }}
+        meta={[
+          {
+            registration: form.register("associatedPetroChinaContractNumber"),
+            value: shared[1] ?? "",
+            label: gridTranslations("reqContract"),
+            placeholder: "PCH-0000-000",
+            error: errors.associatedPetroChinaContractNumber?.message as string | undefined,
+            icon: FileText,
+            mono: true,
+          },
+          {
+            registration: form.register("contractHoldingPetroChinaDepartment"),
+            value: shared[2] ?? "",
+            label: gridTranslations("reqDepartment"),
+            placeholder: gridTranslations("departmentPlaceholder"),
+            error: errors.contractHoldingPetroChinaDepartment?.message as string | undefined,
+            icon: Building2,
+          },
+        ]}
+      >
+        <InstructionsPopover
+          title={pageTranslations("title")}
+          body={pageTranslations("description")}
+        />
+      </RequestHeader>
 
-        <div className="ms-auto flex gap-7 pb-1">
-          {[
-            { value: counts.total, label: gridTranslations("employees") },
-            { value: counts.photos, label: gridTranslations("photos") },
-            { value: counts.attention, label: gridTranslations("needAttention"), warn: true },
-          ].map((stat) => (
-            <div key={stat.label} className="flex flex-col gap-0.5">
-              <b className={cn(
-                "text-[21px] font-semibold tabular-nums tracking-tight",
-                stat.warn && stat.value > 0 && "text-pch-warnInk"
-              )}>
-                {stat.value}
-              </b>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-pch-ink3">
-                {stat.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex-none flex items-center gap-3 px-5 py-2.5 bg-pch-subtle border-b border-pch-line">
-        <button
-          type="button"
-          onClick={addEmployee}
-          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-pch-line2 bg-pch-surface text-[13px] font-medium text-pch-ink2 shadow-sm hover:text-pch-ink hover:border-pch-ink3"
+      {/* The scroller is absolutely filled so the selection readout can sit in
+          the corner without scrolling away with the rows. */}
+      <div className="relative flex-1 min-h-0">
+        <div
+          {...sheet.containerProps}
+          className="absolute inset-0 overflow-auto bg-pch-surface outline-none"
         >
-          <Plus className="h-3.5 w-3.5" />
-          {formTranslations("addEmployee")}
-        </button>
-        <span className="ms-auto text-[12.5px] text-pch-ink3 hidden md:inline">
-          {gridTranslations("keyboardHint")}
-        </span>
-      </div>
-
-      <div ref={gridRef} className="flex-1 min-h-0 overflow-auto bg-pch-surface">
+        <div ref={gridRef} className="contents">
         <table className="table-fixed w-full min-w-[1180px] border-separate border-spacing-0">
           <colgroup>
             {COLUMN_WIDTHS.map((width, index) => <col key={index} style={{ width }} />)}
           </colgroup>
           <thead>
             <tr>
-              <th className="h-[30px] bg-pch-subtle border-b border-e border-pch-line sticky top-0 z-10" />
-              {groupCell(gridTranslations("person"), 4)}
-              {groupCell(gridTranslations("identity"), 2)}
-              {groupCell(gridTranslations("contract"), 1)}
-              {groupCell(gridTranslations("clearance"), 3)}
-              {groupCell(gridTranslations("documents"), 4, true)}
-            </tr>
-            <tr>
-              <th className="h-9 bg-pch-surface border-b border-pch-line2 border-e border-e-pch-line sticky top-[30px] z-10" />
+              <th className="h-9 bg-pch-subtle border-b border-e border-pch-line2 sticky top-0 z-20" />
               {headerCell(gridTranslations("colBadge"), true)}
               {headerCell(gridTranslations("colFirstName"), true)}
               {headerCell(gridTranslations("colLastName"), true)}
@@ -457,18 +407,18 @@ export default function PersonalBadgeForm() {
               const complete = isRowComplete(row);
 
               return (
-                <tr key={field.id} className="group/row hover:bg-pch-ground">
-                  <td className="relative p-0 border-b border-e border-pch-line text-center align-middle">
+                <tr key={field.id} className="group/row hover:bg-pch-ground/70 transition-colors">
+                  <td className="relative p-0 border-b border-e border-pch-line2 bg-pch-subtle/60 text-center align-middle">
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "absolute inset-y-0 start-0 w-[3px]",
-                        rowInvalid ? "bg-pch-stopEdge" : complete ? "bg-transparent" : "bg-pch-warnEdge"
+                        "absolute inset-y-0 start-0 w-[2px] transition-colors",
+                        rowInvalid ? "bg-pch-stopEdge" : complete ? "bg-pch-okInk/40" : "bg-transparent"
                       )}
                     />
                     <span className={cn(
-                      "font-mono text-[11.5px] tabular-nums group-hover/row:hidden",
-                      rowInvalid ? "text-pch-stopInk font-semibold" : "text-pch-ink3"
+                      "font-mono text-[11px] tabular-nums group-hover/row:hidden",
+                      rowInvalid ? "text-pch-stopInk font-semibold" : "text-pch-ink3/70"
                     )}>
                       {index + 1}
                     </span>
@@ -484,101 +434,85 @@ export default function PersonalBadgeForm() {
                     )}
                   </td>
 
-                  <TextCell index={index} name="id" mono placeholder="1234" />
-                  <TextCell index={index} name="firstName" />
-                  <TextCell index={index} name="lastName" />
-                  <TextCell index={index} name="position" />
-                  <TextCell index={index} name="idDocumentNumber" mono />
+                  <TextCell {...form.register(`employees.${index}.id`)} {...cellError(index, "id")} {...cell(index, 0)} mono prefix="HFYC-" digitsOnly maxLength={4} inputMode="numeric" placeholder="0000" />
+                  <TextCell {...form.register(`employees.${index}.firstName`)} {...cellError(index, "firstName")} {...cell(index, 1)} />
+                  <TextCell {...form.register(`employees.${index}.lastName`)} {...cellError(index, "lastName")} {...cell(index, 2)} />
+                  <TextCell {...form.register(`employees.${index}.position`)} {...cellError(index, "position")} {...cell(index, 3)} />
+                  <TextCell {...form.register(`employees.${index}.idDocumentNumber`)} {...cellError(index, "idDocumentNumber")} {...cell(index, 4)} mono />
 
-                  <td
-                    className="p-0 border-b border-e border-pch-line h-11"
-                    data-invalid={Boolean(errors.employees?.[index]?.nationality) || undefined}
+                  <SelectCell
+                    {...form.register(`employees.${index}.nationality`)}
+                    {...cellError(index, "nationality")}
+                    {...cell(index, 5)}
                   >
-                    <select
-                      {...form.register(`employees.${index}.nationality` as const)}
-                      className={cn(
-                        cellClass(Boolean(errors.employees?.[index]?.nationality)),
-                        "appearance-none cursor-pointer"
-                      )}
-                    >
-                      <option value="" />
-                      {nationalities.map((nationality) => (
-                        <option key={nationality.num_code} value={nationality.nationality}>
-                          {locale === "ar"
-                            ? nationality.nationality_ar
-                            : locale === "cn"
-                              ? nationality.nationality_cn
-                              : nationality.nationality}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
+                    <option value="" />
+                    {nationalities.map((nationality) => (
+                      <option key={nationality.num_code} value={nationality.nationality}>
+                        {locale === "ar"
+                          ? nationality.nationality_ar
+                          : locale === "cn"
+                            ? nationality.nationality_cn
+                            : nationality.nationality}
+                      </option>
+                    ))}
+                  </SelectCell>
 
-                  <TextCell index={index} name="subcontractor" />
-                  <TextCell index={index} name="eaLetterNumber" mono />
-                  <TextCell index={index} name="numberInEaList" mono />
+                  <TextCell {...form.register(`employees.${index}.subcontractor`)} {...cellError(index, "subcontractor")} {...cell(index, 6)} />
+                  <TextCell {...form.register(`employees.${index}.eaLetterNumber`)} {...cellError(index, "eaLetterNumber")} {...cell(index, 7)} mono />
+                  <TextCell {...form.register(`employees.${index}.numberInEaList`)} {...cellError(index, "numberInEaList")} {...cell(index, 8)} mono />
 
-                  <td
-                    className="p-0 border-b border-e border-pch-line h-11"
-                    data-invalid={Boolean(errors.employees?.[index]?.securityClearanceExpiryDate) || undefined}
-                    title={formatExpiryDate(row?.securityClearanceExpiryDate ?? "") || undefined}
-                  >
-                    <input
-                      type="date"
-                      dir="ltr"
-                      {...form.register(`employees.${index}.securityClearanceExpiryDate` as const)}
-                      className={cn(
-                        cellClass(Boolean(errors.employees?.[index]?.securityClearanceExpiryDate)),
-                        "font-mono text-[12.5px] tabular-nums"
-                      )}
-                    />
-                  </td>
+                  <DateCell
+                    {...form.register(`employees.${index}.securityClearanceExpiryDate`)}
+                    {...cell(index, 9)}
+                    invalid={cellError(index, "securityClearanceExpiryDate").invalid}
+                    message={formatExpiryDate(row?.securityClearanceExpiryDate ?? "") || undefined}
+                  />
 
-                  <DocCell index={index} name="photo" label={formTranslations("photo")} required />
-                  <DocCell index={index} name="idDocument" label={formTranslations("idDocument")} required />
-                  <DocCell index={index} name="drivingLicense" label={formTranslations("drivingLicense")} />
-                  <DocCell index={index} name="moiCard" label={formTranslations("moiCard")} />
+                  <DocumentTd control={form.control} name={`employees.${index}.photo`} label={formTranslations("photo")} required {...cell(index, 10)} invalid={cellError(index, "photo").invalid} />
+                  <DocumentTd control={form.control} name={`employees.${index}.idDocument`} label={formTranslations("idDocument")} required {...cell(index, 11)} invalid={cellError(index, "idDocument").invalid} />
+                  <DocumentTd control={form.control} name={`employees.${index}.drivingLicense`} label={formTranslations("drivingLicense")} {...cell(index, 12)} invalid={cellError(index, "drivingLicense").invalid} />
+                  <DocumentTd control={form.control} name={`employees.${index}.moiCard`} label={formTranslations("moiCard")} {...cell(index, 13)} invalid={cellError(index, "moiCard").invalid} />
                 </tr>
               );
             })}
 
-            <tr onClick={addEmployee} className="cursor-pointer hover:bg-pch-accentSoft group/add">
-              <td className="border-b border-e border-pch-line text-center h-10">
-                <span className="font-mono text-[11.5px] text-pch-ink3 group-hover/add:text-pch-accentInk">+</span>
+            <tr onClick={addEmployee} className="cursor-pointer group/add">
+              <td className="border-b border-e border-pch-line2 bg-pch-subtle/60 text-center h-11">
+                <Plus className="h-3.5 w-3.5 mx-auto text-pch-ink3/60 group-hover/add:text-pch-accent transition-colors" />
               </td>
-              <td colSpan={14} className="border-b border-pch-line px-3 text-[13px] text-pch-ink3 group-hover/add:text-pch-accentInk">
+              <td colSpan={14} className="border-b border-pch-line px-3 text-[13px] text-pch-ink3/80 group-hover/add:text-pch-accent transition-colors">
                 {formTranslations("addEmployee")}
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
+        </div>
+
+        {sheet.isMultiCell && (
+          <span className="absolute bottom-3 end-3 z-30 rounded-md bg-pch-action/90 px-2.5 py-1 text-[11.5px] font-medium text-white tabular-nums shadow-lg backdrop-blur-sm">
+            {gridTranslations("selectedCells", { count: sheet.selectedCount })}
+          </span>
+        )}
       </div>
 
-      <div className="flex-none flex flex-wrap items-center gap-4 px-5 py-3.5 bg-pch-surface border-t border-pch-line2">
-        <p className="text-[13.5px] text-pch-ink2">
-          <b className="text-pch-ink font-semibold">
-            {gridTranslations("employeeCount", { count: counts.total })}
-          </b>
-          {" · "}
-          {gridTranslations("photoCount", { count: counts.photos })}
-          {counts.attention > 0 && (
-            <>
-              {" · "}
-              <span className="text-pch-warnInk font-semibold">
-                {gridTranslations("attentionCount", { count: counts.attention })}
-              </span>
-            </>
-          )}
-        </p>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="ms-auto inline-flex items-center gap-2 h-10 px-5 rounded-md bg-pch-accent text-white text-[14px] font-semibold shadow-md hover:brightness-110 disabled:opacity-45 disabled:cursor-not-allowed disabled:brightness-100"
-        >
-          {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isSubmitting ? commonTranslations("generating") : formTranslations("generateZIP")}
-        </button>
-      </div>
+      {sheet.menu && (
+        <SheetContextMenu
+          x={sheet.menu.x}
+          y={sheet.menu.y}
+          canDeleteRow={fields.length > 1}
+          onClose={sheet.closeMenu}
+          actions={sheet.menuActions}
+        />
+      )}
+
+      <SheetFooter
+        ready={counts.total - counts.attention}
+        total={counts.total}
+        isSubmitting={isSubmitting}
+        submitLabel={formTranslations("generateZIP")}
+        busyLabel={commonTranslations("generating")}
+      />
     </form>
   );
 }

@@ -25,7 +25,8 @@
     "fixErrorsDescription": "请检查标记的选项卡并填写必填字段。",
     "generating": "正在生成 ZIP...",
     "copiedFromPrevious": "已从上一条记录复制公司信息",
-    "willBeWrittenAs": "将写入为"
+    "willBeWrittenAs": "将写入为",
+    "appShortName": "证件"
   },
   "header": {
     "home": "首页"
@@ -94,7 +95,8 @@
         "drivingLicenseRequired": "需要驾驶证",
         "moiCardRequired": "需要内政部卡",
         "securityClearanceExpiryDateRequired": "安全许可到期日期为必填项",
-        "badgeNumberDuplicate": "该证件号已被第 {row} 行使用"
+        "badgeNumberDuplicate": "该证件号已被第 {row} 行使用",
+        "badgeNumberFormat": "证件号必须为 4 位数字"
       },
       "securityClearanceExpiryDate": "安全许可到期日期"
     }
@@ -265,7 +267,7 @@
     "fixErrorsInGrid": "生成 ZIP 前请修正标记的单元格。",
     "employeeCount": "{count} 名员工",
     "photoCount": "{count} 张照片",
-    "attentionCount": "{count} 行需处理",
+    "attentionCount": "{count} 需处理",
     "colBadge": "证件号",
     "colFirstName": "名",
     "colLastName": "姓",
@@ -296,6 +298,26 @@
     "registration": "登记",
     "drivers": "司机",
     "vehicleCount": "{count} 辆车",
-    "driversHint": "用逗号分隔，例如 HFYC1234, HFYC5678"
+    "driversHint": "用逗号分隔，例如 HFYC1234, HFYC5678",
+    "rowsReady": "已完成",
+    "reqContractor": "承包商",
+    "reqContract": "PCH 合同号",
+    "reqDepartment": "归属部门",
+    "menuCut": "剪切",
+    "menuCopy": "复制",
+    "menuPaste": "粘贴",
+    "menuClear": "清除内容",
+    "menuInsertAbove": "在上方插入行",
+    "menuInsertBelow": "在下方插入行",
+    "menuDeleteRow": "删除行",
+    "selectedCells": "已选 {count} 个单元格",
+    "requestDetails": "申请信息",
+    "sheetHint": "选择单元格复制，或直接从 Excel 粘贴",
+    "contractorPlaceholder": "承包商名称",
+    "departmentPlaceholder": "部门",
+    "instructions": "使用说明",
+    "clientSideNote": "数据不会离开浏览器 — 文件在本机生成。",
+    "allRowsReady": "全部行已就绪",
+    "rowCount": "{count} 行"
   }
 }

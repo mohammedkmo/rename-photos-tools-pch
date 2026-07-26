@@ -25,7 +25,8 @@
     "fixErrorsDescription": "راجع علامات التبويب المميزة واملأ الحقول المطلوبة.",
     "generating": "جاري إنشاء الملف...",
     "copiedFromPrevious": "تم نسخ بيانات الشركة من الإدخال السابق",
-    "willBeWrittenAs": "سيتم كتابته هكذا"
+    "willBeWrittenAs": "سيتم كتابته هكذا",
+    "appShortName": "الباجات"
   },
   "header": {
     "home": "الرئيسية"
@@ -93,7 +94,8 @@
         "idDocumentRequired": "وثيقة هوية الموظف مطلوبة",
         "drivingLicenseRequired": "رخصة القيادة للموظف مطلوبة إذا كان سائقاً",
         "securityClearanceExpiryDateRequired": "تاريخ انتهاء الموافقة الأمنية مطلوب",
-        "badgeNumberDuplicate": "رقم الباج مستخدم بالفعل في الصف {row}"
+        "badgeNumberDuplicate": "رقم الباج مستخدم بالفعل في الصف {row}",
+        "badgeNumberFormat": "رقم الباج يجب أن يكون 4 أرقام بالضبط"
       },
       "securityClearanceExpiryDate": "تاريخ انتهاء الموافقة الأمنية"
     }
@@ -267,7 +269,7 @@
     "fixErrorsInGrid": "يجب تصحيح الخانات المميزة قبل إنشاء الملف.",
     "employeeCount": "{count} موظف",
     "photoCount": "{count} صورة",
-    "attentionCount": "{count} صفوف تحتاج مراجعة",
+    "attentionCount": "{count} تحتاج مراجعة",
     "colBadge": "رقم الباج",
     "colFirstName": "الاسم",
     "colLastName": "اللقب",
@@ -298,6 +300,26 @@
     "registration": "التسجيل",
     "drivers": "السائقون",
     "vehicleCount": "{count} مركبة",
-    "driversHint": "مفصولة بفواصل، مثال: HFYC1234, HFYC5678"
+    "driversHint": "مفصولة بفواصل، مثال: HFYC1234, HFYC5678",
+    "rowsReady": "جاهز",
+    "reqContractor": "المقاول",
+    "reqContract": "رقم عقد PCH",
+    "reqDepartment": "القسم المتعاقد",
+    "menuCut": "قص",
+    "menuCopy": "نسخ",
+    "menuPaste": "لصق",
+    "menuClear": "مسح المحتوى",
+    "menuInsertAbove": "إدراج صف أعلاه",
+    "menuInsertBelow": "إدراج صف أدناه",
+    "menuDeleteRow": "حذف الصف",
+    "selectedCells": "{count} خانة محددة",
+    "requestDetails": "تفاصيل الطلب",
+    "sheetHint": "حدد الخانات وانسخها، أو الصق مباشرة من Excel",
+    "contractorPlaceholder": "اسم المقاول",
+    "departmentPlaceholder": "القسم",
+    "instructions": "التعليمات",
+    "clientSideNote": "لا شيء يغادر متصفحك — يتم إنشاء الملفات على هذا الجهاز.",
+    "allRowsReady": "جميع الصفوف جاهزة",
+    "rowCount": "{count} صف"
   }
 }

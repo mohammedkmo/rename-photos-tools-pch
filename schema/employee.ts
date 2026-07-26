@@ -14,7 +14,8 @@ export const requestSchema = (t: any) =>
   });
 
 export const employeeSchema = (t: any) => z.object({
-    id: z.string().min(1, t('validation.badgeNumberRequired')),
+    // Badge numbers are always four digits; the HFYC prefix is added on export.
+    id: z.string().regex(/^\d{4}$/, t('validation.badgeNumberFormat')),
     firstName: z.string().min(2, t('validation.firstNameMinLength')),
     lastName: z.string().min(2, t('validation.lastNameMinLength')),
     position: z.string().min(2, t('validation.positionMinLength')),

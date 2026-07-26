@@ -22,9 +22,10 @@ const config = {
 		   ibmPlexSansArabic: ['var(--font-arabic)'],
 		},
   		colors: {
-  			// Badging tool palette: navy ink rather than black, a cool
-  			// off-white ground, hairline rules, indigo kept for the primary
-  			// action only, and PetroChina red reserved for the logo.
+  			// Navy ink, a cool off-white ground and hairline rules. `accent`
+  			// belongs to the sheet itself - selection, the active cell, cell
+  			// focus. Chrome outside the sheet (buttons, bars) uses `action`,
+  			// which is near black so nothing competes with the data.
   			pch: {
   				ground: '#F6F9FC',
   				surface: '#FFFFFF',
@@ -34,9 +35,11 @@ const config = {
   				ink3: '#8792A2',
   				line: '#E6EBF1',
   				line2: '#D5DBE1',
-  				accent: '#635BFF',
-  				accentInk: '#4B44D6',
-  				accentSoft: '#F0F0FF',
+  				accent: '#2563EB',
+  				accentInk: '#1D4ED8',
+  				accentSoft: '#EFF6FF',
+  				action: '#111114',
+  				actionInk: '#000000',
   				okBg: '#CBF4C9',
   				okInk: '#0E6245',
   				warnBg: '#F8E5B9',

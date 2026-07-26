@@ -7,10 +7,10 @@ export const metadata: Metadata = {
 }
 
 export default function PersonalBadgePage() {
-  // The grid owns its own scrolling, so the page fills the space under the
-  // 3.5rem header exactly rather than growing the document.
+  // The shell bounds the height, so this just claims the space left under the
+  // top bar. Only the grid inside scrolls.
   return (
-    <div className="flex-1 min-h-0 flex flex-col h-[calc(100dvh-3.5rem)]">
+    <div className="flex-1 min-h-0 flex flex-col">
       <PersonalBadgeForm />
     </div>
   );

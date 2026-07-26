@@ -25,7 +25,8 @@
     "fixErrorsDescription": "Check the highlighted tabs and fill in the required fields.",
     "generating": "Generating ZIP...",
     "copiedFromPrevious": "Company details copied from the previous entry",
-    "willBeWrittenAs": "Will be written as"
+    "willBeWrittenAs": "Will be written as",
+    "appShortName": "Badging"
   },
   "header": {
     "home": "Home"
@@ -91,7 +92,8 @@
         "drivingLicenseRequired": "Driving License is required",
         "moiCardRequired": "MOI Card is required",
         "securityClearanceExpiryDateRequired": "Security clearance expiry date is required",
-        "badgeNumberDuplicate": "This badge number is already used by row {row}"
+        "badgeNumberDuplicate": "This badge number is already used by row {row}",
+        "badgeNumberFormat": "Badge number must be exactly 4 digits"
       },
       "securityClearanceExpiryDate": "Security Clearance Expiry Date"
     }
@@ -274,7 +276,7 @@
     "fixErrorsInGrid": "The highlighted cells need fixing before the ZIP can be generated.",
     "employeeCount": "{count} employees",
     "photoCount": "{count} photos",
-    "attentionCount": "{count} rows need attention",
+    "attentionCount": "{count} need attention",
     "colBadge": "Badge no.",
     "colFirstName": "First name",
     "colLastName": "Last name",
@@ -305,6 +307,26 @@
     "registration": "Registration",
     "drivers": "Drivers",
     "vehicleCount": "{count} vehicles",
-    "driversHint": "Comma separated, e.g. HFYC1234, HFYC5678"
+    "driversHint": "Comma separated, e.g. HFYC1234, HFYC5678",
+    "rowsReady": "ready",
+    "reqContractor": "Contractor",
+    "reqContract": "PCH contract no.",
+    "reqDepartment": "Holding department",
+    "menuCut": "Cut",
+    "menuCopy": "Copy",
+    "menuPaste": "Paste",
+    "menuClear": "Clear contents",
+    "menuInsertAbove": "Insert row above",
+    "menuInsertBelow": "Insert row below",
+    "menuDeleteRow": "Delete row",
+    "selectedCells": "{count} cells selected",
+    "requestDetails": "Request details",
+    "sheetHint": "Select cells and copy, or paste a block straight from Excel",
+    "contractorPlaceholder": "Contractor name",
+    "departmentPlaceholder": "Department",
+    "instructions": "Instructions",
+    "clientSideNote": "Nothing leaves your browser — files are built on this device.",
+    "allRowsReady": "All rows ready",
+    "rowCount": "{count} rows"
   }
 }
