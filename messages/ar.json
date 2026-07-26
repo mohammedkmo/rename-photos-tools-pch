@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "أدوات باجات PCH",
+    "appName": "مكتب باجات الحلفاية",
     "whatLookingFor": "ما الذي تبحث عنه؟",
     "applyingForPersonalBadges": "التقدم للحصول على باجات شخصية",
     "applyingForVehicleBadges": "التقدم للحصول على باجات المركبات",
@@ -15,18 +15,13 @@
     "personalBadges": "باجات شخصية",
     "vehicleBadges": "باجات المركبات",
     "continueAnyway": "المتابعة على أي حال",
-    "draftFound": "لديك عمل غير محفوظ من {when}.",
-    "draftPhotosNotIncluded": "لا يتم حفظ الصور والمستندات وستحتاج إلى رفعها مرة أخرى.",
-    "draftRestore": "استعادة",
-    "draftDiscard": "تجاهل",
-    "draftRestored": "تمت استعادة المسودة",
-    "draftRestoredDescription": "تمت استعادة البيانات النصية. يرجى رفع الصور والمستندات مرة أخرى.",
     "fixErrors": "بعض البيانات ناقصة",
     "fixErrorsDescription": "راجع علامات التبويب المميزة واملأ الحقول المطلوبة.",
     "generating": "جاري إنشاء الملف...",
     "copiedFromPrevious": "تم نسخ بيانات الشركة من الإدخال السابق",
     "willBeWrittenAs": "سيتم كتابته هكذا",
-    "appShortName": "الباجات"
+    "appShortName": "الباجات",
+    "backToApplications": "العودة إلى الطلبات"
   },
   "header": {
     "home": "الرئيسية"
@@ -255,6 +250,21 @@
     "fleetNumber": "رقم المركبة للمركبة (إن وجد)",
     "chassisNumber": "رقم الهيكل الفريد للمركبة"
   },
+  "collaboration": {
+    "start": "بدء التعاون",
+    "startHint": "ابدأ التعاون قبل رفع الملفات؛ لا يمكن نقل ملفات المتصفح إلى الغرفة المشتركة.",
+    "share": "نسخ رابط المشاركة",
+    "copied": "تم نسخ الرابط",
+    "owner": "المالك · الملفات وZIP",
+    "editor": "محرر · النص فقط",
+    "end": "إنهاء التعاون",
+    "leave": "مغادرة",
+    "endHint": "إغلاق الغرفة المشتركة للجميع",
+    "leaveHint": "مغادرة الغرفة المشتركة",
+    "endConfirm": "هل تريد إنهاء التعاون للجميع؟ سيتم إغلاق الغرفة نهائياً. سيُحفظ النص كمسودة محلية، لكن يجب إرفاق الملفات مرة أخرى.",
+    "you": "أنت",
+    "error": "التعاون غير متاح. تحقق من متغيرات بيئة Vercel."
+  },
   "grid": {
     "person": "الشخص",
     "identity": "الهوية",
@@ -277,12 +287,12 @@
     "colIdDocument": "رقم الهوية",
     "colNationality": "الجنسية",
     "colSubcontractor": "المقاول الثانوي",
-    "colEaLetter": "كتاب EA",
-    "colEaList": "رقم بالقائمة",
+    "colEaLetter": "رقم التصريح الامني",
+    "colEaList": "التسلسل",
     "colExpires": "تاريخ الانتهاء",
     "colPhoto": "الصورة",
     "colId": "الهوية",
-    "colLicence": "الإجازة",
+    "colLicence": "اجازة السياقة",
     "colMoi": "بطاقة الداخلية",
     "colPlate": "رقم اللوحة",
     "colProvince": "المحافظة",
@@ -320,6 +330,40 @@
     "instructions": "التعليمات",
     "clientSideNote": "لا شيء يغادر متصفحك — يتم إنشاء الملفات على هذا الجهاز.",
     "allRowsReady": "جميع الصفوف جاهزة",
-    "rowCount": "{count} صف"
+    "rowCount": "{count} صف",
+    "ownerOnlyZIP": "يمكن لمالك الجدول فقط إنشاء ملف ZIP",
+    "saving": "جاري الحفظ…",
+    "saved": "تم الحفظ",
+    "savedTextOnly": "تم الحفظ، الصور كبيرة جداً"
+  },
+  "documents": {
+    "title": "طلباتك",
+    "subtitle": "{count} محفوظة على هذا الجهاز",
+    "newPersonal": "طلب باج شخصي جديد",
+    "newVehicles": "طلب باج مركبة جديد",
+    "newPersonalHint": "صف لكل موظف",
+    "newVehiclesHint": "صف لكل مركبة",
+    "emptyTitle": "لا توجد طلبات بعد",
+    "emptyBody": "ابدأ طلب باج وسيتم حفظه هنا على هذا الجهاز لتتمكن من إكماله لاحقاً.",
+    "untitled": "بدون عنوان",
+    "employeeRows": "{count} موظف",
+    "vehicleRows": "{count} مركبة",
+    "edited": "آخر تعديل {when}",
+    "delete": "حذف الطلب",
+    "confirmDelete": "حذف",
+    "cancel": "إلغاء",
+    "storageNote": "تُحفظ الطلبات في هذا المتصفح فقط. مسح بيانات الموقع سيحذفها.",
+    "subtitleEmpty": "لا يوجد شيء محفوظ على هذا الجهاز بعد",
+    "colName": "الطلب",
+    "colContractor": "المقاول",
+    "colType": "النوع",
+    "colRows": "الصفوف",
+    "colEdited": "آخر تعديل",
+    "typePersonal": "شخصي",
+    "typeVehicles": "مركبات",
+    "photoShort": "{count} صورة",
+    "newShort": "طلب جديد",
+    "collabHint": "شارك أي طلب واملأ الجدول مع زملائك مباشرة.",
+    "collabHintShort": "يمكن تعبئة الجداول بشكل جماعي ومباشر"
   }
 }

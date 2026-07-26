@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { Check, FileCheck2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 10_000_000;
@@ -14,6 +14,8 @@ interface DocumentCellProps {
   label: string;
   required?: boolean;
   invalid?: boolean;
+  readOnly?: boolean;
+  uploaded?: boolean;
 }
 
 /**
@@ -26,6 +28,8 @@ export default function DocumentCell({
   label,
   required,
   invalid,
+  readOnly,
+  uploaded,
 }: DocumentCellProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState("");
@@ -53,11 +57,13 @@ export default function DocumentCell({
     <div
       className="flex items-center justify-center h-full"
       onDragOver={(event) => {
+        if (readOnly) return;
         event.preventDefault();
         setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={(event) => {
+        if (readOnly) return;
         event.preventDefault();
         setDragOver(false);
         accept(event.dataTransfer.files?.[0]);
@@ -71,7 +77,22 @@ export default function DocumentCell({
         onChange={(event) => accept(event.target.files?.[0])}
       />
 
-      {preview ? (
+      {readOnly ? (
+        <span
+          title={uploaded ? `${label} uploaded by the owner` : `${label} not uploaded yet`}
+          className={cn(
+            "relative flex h-8 w-8 items-center justify-center rounded-md border",
+            uploaded
+              ? "border-pch-okInk/35 bg-pch-okBg text-pch-okInk"
+              : "border-pch-line2 bg-pch-subtle text-pch-ink3/55"
+          )}
+        >
+          <FileCheck2 className="h-4 w-4" />
+          {uploaded && (
+            <Check className="absolute -bottom-1 -end-1 h-3.5 w-3.5 rounded-full bg-pch-okInk p-0.5 text-white" />
+          )}
+        </span>
+      ) : preview ? (
         <span className="relative group/doc">
           <button
             type="button"

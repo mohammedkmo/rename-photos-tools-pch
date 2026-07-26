@@ -6,14 +6,14 @@ import { useForm, useFieldArray, useWatch, Controller, type FieldErrors } from "
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import XLSX from "xlsx-js-style";
-import { Building2, FileText, Plus, RotateCcw, X } from "lucide-react";
+import { Building2, FileText, Plus, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { FormValues, VehicleValues, formSchema } from "@/schema/vehicle";
 import { provinces } from "@/data/provinces";
-import { formatDate, formatExpiryDate, intlLocale } from "@/lib/helpers";
+import { formatDate, formatExpiryDate } from "@/lib/helpers";
 import { toJpeg } from "@/lib/images";
-import { useFormDraft } from "@/hooks/use-form-draft";
+import { useDocument } from "@/hooks/use-document";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { TextCell, SelectCell, DateCell, DocumentTd, CustomCell } from "@/components/grid/cells";
@@ -21,10 +21,13 @@ import DriverBadgesCell from "@/components/grid/DriverBadgesCell";
 import SheetContextMenu from "@/components/grid/SheetContextMenu";
 import RequestHeader from "@/components/grid/RequestHeader";
 import InstructionsPopover from "@/components/grid/InstructionsPopover";
+import HeaderPortal, { HEADER_ACTION_SLOT, HEADER_DOC_SLOT } from "@/components/layout/HeaderPortal";
 import SheetFooter from "@/components/grid/SheetFooter";
+import GenerateZipButton from "@/components/grid/GenerateZipButton";
 import { useSheet } from "@/hooks/use-sheet";
-
-const DRAFT_KEY = "hfyc:draft:vehicles";
+import { useCollaborativeForm } from "@/hooks/use-collaborative-form";
+import CollaborationControls from "@/components/collaboration/CollaborationControls";
+import type { SharedRow } from "@/lib/collaboration/types";
 
 const EMPTY_VEHICLE: VehicleValues = {
   plateNumber: "",
@@ -71,6 +74,19 @@ const REQUIRED_TEXT_FIELDS = [
   "securityClearanceExpiryDate",
 ] as const;
 
+const VEHICLE_TEXT_FIELDS = [
+  "plateNumber", "province", "make", "model", "softskinArmored",
+  "senewiyahNumber", "wakalaNumber", "subcontractor", "relatedPersons",
+  "eaLetterNumber", "numberInEaList", "securityClearanceExpiryDate",
+];
+
+const VEHICLE_MEDIA_FIELDS: Record<string, keyof SharedRow> = {
+  photo: "mediaPhoto",
+  senewiyah: "mediaSenewiyah",
+  wakala: "mediaWakala",
+  armoredVehicleCertificate: "mediaArmoredVehicleCertificate",
+};
+
 const isRowComplete = (vehicle?: Partial<VehicleValues>) =>
   Boolean(
     vehicle &&
@@ -87,7 +103,7 @@ const normaliseDrivers = (value?: string) =>
     .filter(Boolean)
     .join(",");
 
-export default function VehiclesBadgeForm() {
+export default function VehiclesBadgeForm({ documentId }: { documentId?: string }) {
   const locale = useLocale();
   const formTranslations = useTranslations("vehiclesBadge.form");
   const gridTranslations = useTranslations("grid");
@@ -105,7 +121,7 @@ export default function VehiclesBadgeForm() {
     },
   });
 
-  const { fields, append, insert, remove } = useFieldArray({ name: "vehicles", control: form.control });
+  const { fields, append, insert, remove, replace } = useFieldArray({ name: "vehicles", control: form.control });
   const vehicles = useWatch({ control: form.control, name: "vehicles" });
   const shared = useWatch({
     control: form.control,
@@ -113,6 +129,14 @@ export default function VehiclesBadgeForm() {
   });
   const { errors, isSubmitting } = form.formState;
   const gridRef = useRef<HTMLDivElement>(null);
+  const collaborative = useCollaborativeForm({
+    form,
+    arrayName: "vehicles",
+    emptyRow: EMPTY_VEHICLE,
+    textFields: VEHICLE_TEXT_FIELDS,
+    mediaFields: VEHICLE_MEDIA_FIELDS,
+    replaceRows: replace,
+  });
 
   const sheet = useSheet({
     rowCount: fields.length,
@@ -124,45 +148,54 @@ export default function VehiclesBadgeForm() {
         shouldValidate: true,
       }),
     ensureRows: (count) => {
+      if (collaborative.ensureRows(count)) return;
       const missing = count - form.getValues("vehicles").length;
       if (missing > 0) append(Array.from({ length: missing }, () => ({ ...EMPTY_VEHICLE })));
     },
-    insertRow: (at) => insert(at, { ...EMPTY_VEHICLE }),
-    deleteRow: (at) => remove(at),
+    insertRow: (at) => {
+      if (!collaborative.addRow(at)) insert(at, { ...EMPTY_VEHICLE });
+    },
+    deleteRow: (at) => {
+      if (!collaborative.removeRow(at)) remove(at);
+    },
+    onSelectionChange: collaborative.setSelection,
   });
 
-  const { draft, save: saveDraft, clear: clearDraft, dismiss: dismissDraft } =
-    useFormDraft<FormValues>(DRAFT_KEY);
-
-  useEffect(() => {
-    const subscription = form.watch((values) => saveDraft(values as FormValues));
-    return () => subscription.unsubscribe();
-  }, [form, saveDraft]);
+  const doc = useDocument<FormValues>({
+    id: documentId ?? null,
+    kind: "vehicles",
+    form,
+    arrayName: "vehicles",
+    enabled: !collaborative.collaboration,
+  });
 
   const counts = useMemo(() => {
     const rows = (vehicles ?? []) as Partial<VehicleValues>[];
     return {
       total: rows.length,
-      photos: rows.filter((row) => row?.photo).length,
-      attention: rows.filter((row) => !isRowComplete(row)).length,
+      photos: rows.filter((row, index) =>
+        collaborative.collaboration
+          ? collaborative.mediaStatus(index, "photo")
+          : row?.photo
+      ).length,
+      attention: rows.filter((row, index) => {
+        const textReady = REQUIRED_TEXT_FIELDS.every((key) =>
+          String(row?.[key] ?? "").trim()
+        );
+        const mediaReady = collaborative.collaboration
+          ? collaborative.mediaStatus(index, "photo") &&
+            collaborative.mediaStatus(index, "senewiyah")
+          : Boolean(row?.photo && row?.senewiyah);
+        return !(textReady && mediaReady);
+      }).length,
     };
-  }, [vehicles]);
+  }, [collaborative, vehicles]);
 
   const addVehicle = () => {
-    append({ ...EMPTY_VEHICLE });
+    if (!collaborative.addRow()) append({ ...EMPTY_VEHICLE });
     window.setTimeout(() => {
       gridRef.current?.scrollTo({ top: gridRef.current.scrollHeight, behavior: "smooth" });
     }, 0);
-  };
-
-  const restoreDraft = () => {
-    if (!draft) return;
-    form.reset(draft.values);
-    dismissDraft();
-    toast({
-      title: commonTranslations("draftRestored"),
-      description: commonTranslations("draftRestoredDescription"),
-    });
   };
 
   const onInvalid = (_formErrors: FieldErrors<FormValues>) => {
@@ -179,6 +212,7 @@ export default function VehiclesBadgeForm() {
   };
 
   const onSubmit = async (data: FormValues) => {
+    if (collaborative.collaboration && !collaborative.collaboration.isOwner) return;
     try {
       const zip = new JSZip();
 
@@ -267,8 +301,6 @@ export default function VehiclesBadgeForm() {
       const zipBlob = await zip.generateAsync({ type: "blob" });
       saveAs(zipBlob, `${data.contractor} - ${excelData.length} vehicles request.zip`);
 
-      clearDraft();
-
       toast({
         title: formTranslations("createZIPSuccess"),
         description: formTranslations("createZIPSuccessDescription"),
@@ -312,7 +344,7 @@ export default function VehiclesBadgeForm() {
   const headerCell = (label: string, required?: boolean) => (
     <th
       title={label}
-      className="h-9 px-3 text-start text-[11.5px] font-semibold text-pch-ink2 bg-pch-subtle border-b border-e border-pch-line2 sticky top-0 z-20 whitespace-nowrap overflow-hidden text-ellipsis"
+      className="h-9 px-3 text-start text-[11.5px] font-semibold text-pch-ink2 bg-white border-b border-e border-pch-line2 sticky top-0 z-20 whitespace-nowrap overflow-hidden text-ellipsis"
     >
       {label}
       {required && <span className="text-pch-stopEdge ms-0.5 font-normal">*</span>}
@@ -321,35 +353,10 @@ export default function VehiclesBadgeForm() {
 
   return (
     <form
+      id="sheet-form"
       onSubmit={form.handleSubmit(onSubmit, onInvalid)}
       className="flex-1 min-h-0 flex flex-col"
     >
-      {draft && (
-        <div className="flex-none flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-3 bg-pch-warnBg/60 border-b border-pch-line">
-          <RotateCcw className="h-5 w-5 text-pch-warnInk shrink-0" />
-          <div className="flex-1">
-            <p className="text-[13px] font-medium text-pch-warnInk">
-              {commonTranslations("draftFound", {
-                when: new Date(draft.savedAt).toLocaleString(intlLocale(locale)),
-              })}
-            </p>
-            <p className="text-[11.5px] text-pch-warnInk/80">
-              {commonTranslations("draftPhotosNotIncluded")}
-            </p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <button type="button" onClick={restoreDraft}
-              className="h-8 px-3 rounded-md border border-pch-line2 bg-pch-surface text-[12.5px] font-medium hover:border-pch-ink3">
-              {commonTranslations("draftRestore")}
-            </button>
-            <button type="button" onClick={clearDraft}
-              className="h-8 px-3 rounded-md text-[12.5px] font-medium text-pch-ink2 hover:bg-pch-surface">
-              {commonTranslations("draftDiscard")}
-            </button>
-          </div>
-        </div>
-      )}
-
       <RequestHeader
         title={{
           registration: form.register("contractor"),
@@ -383,9 +390,58 @@ export default function VehiclesBadgeForm() {
         />
       </RequestHeader>
 
+      {/* Document identity and file-level tools belong to the top bar, not to
+          the request itself. */}
+      <HeaderPortal slot={HEADER_DOC_SLOT}>
+        {doc.meta && (
+          <span className="inline-flex items-center gap-1.5 h-7 px-2 rounded-md text-[12px] text-pch-ink3">
+            <span className="font-mono font-semibold text-pch-ink2">{doc.meta.name}</span>
+            {doc.status === "saving" && <span>{gridTranslations("saving")}</span>}
+            {doc.status === "saved" && <span className="text-pch-okInk">{gridTranslations("saved")}</span>}
+            {doc.status === "partial" && (
+              <span className="text-pch-warnInk">{gridTranslations("savedTextOnly")}</span>
+            )}
+          </span>
+        )}
+      </HeaderPortal>
+
+      <HeaderPortal slot={HEADER_ACTION_SLOT}>
+        <CollaborationControls
+          kind="vehicles"
+          getSnapshot={() => {
+            const values = form.getValues();
+            return {
+              request: {
+                contractor: values.contractor,
+                associatedPetroChinaContractNumber:
+                  values.associatedPetroChinaContractNumber,
+                contractHoldingPetroChinaDepartment:
+                  values.contractHoldingPetroChinaDepartment,
+              },
+              rows: values.vehicles.map((vehicle) => ({
+                ...vehicle,
+                mediaPhoto: false,
+                mediaSenewiyah: false,
+                mediaWakala: false,
+                mediaArmoredVehicleCertificate: false,
+              })) as any,
+            };
+          }}
+        />
+              <GenerateZipButton
+          formId="sheet-form"
+          complete={counts.total > 0 && counts.attention === 0}
+          isSubmitting={isSubmitting}
+          canSubmit={!collaborative.collaboration || collaborative.collaboration.isOwner}
+          label={formTranslations("generateZIP")}
+          busyLabel={commonTranslations("generating")}
+          restrictedLabel={gridTranslations("ownerOnlyZIP")}
+        />
+      </HeaderPortal>
+
       {/* The scroller is absolutely filled so the selection readout can sit in
           the corner without scrolling away with the rows. */}
-      <div className="relative flex-1 min-h-0">
+      <div className="relative flex-1">
         <div
           {...sheet.containerProps}
           className="absolute inset-0 overflow-auto bg-pch-surface outline-none"
@@ -421,7 +477,13 @@ export default function VehiclesBadgeForm() {
             {fields.map((field, index) => {
               const row = vehicles?.[index] as Partial<VehicleValues> | undefined;
               const rowInvalid = Boolean(errors.vehicles?.[index]);
-              const complete = isRowComplete(row);
+              const complete = collaborative.collaboration
+                ? REQUIRED_TEXT_FIELDS.every((key) =>
+                    String(row?.[key] ?? "").trim()
+                  ) &&
+                  collaborative.mediaStatus(index, "photo") &&
+                  collaborative.mediaStatus(index, "senewiyah")
+                : isRowComplete(row);
 
               return (
                 <tr key={field.id} className="group/row hover:bg-pch-ground/70 transition-colors">
@@ -442,7 +504,9 @@ export default function VehiclesBadgeForm() {
                     {fields.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => remove(index)}
+                        onClick={() => {
+                          if (!collaborative.removeRow(index)) remove(index);
+                        }}
                         title={gridTranslations("removeRow")}
                         className="hidden group-hover/row:inline-flex h-5 w-5 items-center justify-center rounded text-pch-ink3 hover:text-pch-stopInk hover:bg-pch-stopBg"
                       >
@@ -506,10 +570,10 @@ export default function VehiclesBadgeForm() {
                     message={formatExpiryDate(row?.securityClearanceExpiryDate ?? "") || undefined}
                   />
 
-                  <DocumentTd control={form.control} name={`vehicles.${index}.photo`} label={gridTranslations("colVehiclePhoto")} required {...cell(index, 12)} invalid={cellError(index, "photo").invalid} />
-                  <DocumentTd control={form.control} name={`vehicles.${index}.senewiyah`} label={gridTranslations("colSenewiyahDoc")} required {...cell(index, 13)} invalid={cellError(index, "senewiyah").invalid} />
-                  <DocumentTd control={form.control} name={`vehicles.${index}.wakala`} label={gridTranslations("colWakalaDoc")} {...cell(index, 14)} invalid={cellError(index, "wakala").invalid} />
-                  <DocumentTd control={form.control} name={`vehicles.${index}.armoredVehicleCertificate`} label={gridTranslations("colArmoredDoc")} {...cell(index, 15)} invalid={cellError(index, "armoredVehicleCertificate").invalid} />
+                  <DocumentTd control={form.control} name={`vehicles.${index}.photo`} label={gridTranslations("colVehiclePhoto")} required {...cell(index, 12)} invalid={cellError(index, "photo").invalid} readOnly={Boolean(collaborative.collaboration && !collaborative.collaboration.isOwner)} uploaded={collaborative.mediaStatus(index, "photo")} />
+                  <DocumentTd control={form.control} name={`vehicles.${index}.senewiyah`} label={gridTranslations("colSenewiyahDoc")} required {...cell(index, 13)} invalid={cellError(index, "senewiyah").invalid} readOnly={Boolean(collaborative.collaboration && !collaborative.collaboration.isOwner)} uploaded={collaborative.mediaStatus(index, "senewiyah")} />
+                  <DocumentTd control={form.control} name={`vehicles.${index}.wakala`} label={gridTranslations("colWakalaDoc")} {...cell(index, 14)} invalid={cellError(index, "wakala").invalid} readOnly={Boolean(collaborative.collaboration && !collaborative.collaboration.isOwner)} uploaded={collaborative.mediaStatus(index, "wakala")} />
+                  <DocumentTd control={form.control} name={`vehicles.${index}.armoredVehicleCertificate`} label={gridTranslations("colArmoredDoc")} {...cell(index, 15)} invalid={cellError(index, "armoredVehicleCertificate").invalid} readOnly={Boolean(collaborative.collaboration && !collaborative.collaboration.isOwner)} uploaded={collaborative.mediaStatus(index, "armoredVehicleCertificate")} />
                 </tr>
               );
             })}
@@ -527,11 +591,6 @@ export default function VehiclesBadgeForm() {
         </div>
         </div>
 
-        {sheet.isMultiCell && (
-          <span className="absolute bottom-3 end-3 z-30 rounded-md bg-pch-action/90 px-2.5 py-1 text-[11.5px] font-medium text-white tabular-nums shadow-lg backdrop-blur-sm">
-            {gridTranslations("selectedCells", { count: sheet.selectedCount })}
-          </span>
-        )}
       </div>
 
       {sheet.menu && (
@@ -547,9 +606,8 @@ export default function VehiclesBadgeForm() {
       <SheetFooter
         ready={counts.total - counts.attention}
         total={counts.total}
-        isSubmitting={isSubmitting}
-        submitLabel={formTranslations("generateZIP")}
-        busyLabel={commonTranslations("generating")}
+        selectedCount={sheet.selectedCount}
+        isMultiCell={sheet.isMultiCell}
       />
     </form>
   );

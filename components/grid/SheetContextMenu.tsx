@@ -39,14 +39,23 @@ export default function SheetContextMenu({ x, y, canDeleteRow, onClose, actions 
     };
   }, [onClose]);
 
-  // Keep the menu on screen when opened near an edge.
+  // Menus open along the reading direction, and must stay on screen at either
+  // edge - in Arabic the overflow to guard against is the left one.
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
+    const rtl = window.getComputedStyle(document.documentElement).direction === "rtl";
+    if (rtl) node.style.left = `${x - node.getBoundingClientRect().width}px`;
+
     const box = node.getBoundingClientRect();
-    if (box.right > window.innerWidth) node.style.left = `${window.innerWidth - box.width - 8}px`;
-    if (box.bottom > window.innerHeight) node.style.top = `${window.innerHeight - box.height - 8}px`;
-  }, []);
+    if (box.right > window.innerWidth) {
+      node.style.left = `${window.innerWidth - box.width - 8}px`;
+    }
+    if (box.left < 0) node.style.left = "8px";
+    if (box.bottom > window.innerHeight) {
+      node.style.top = `${window.innerHeight - box.height - 8}px`;
+    }
+  }, [x]);
 
   const items = [
     { key: "cut", label: t("menuCut"), icon: Scissors, run: actions.cut, shortcut: "⌘X" },

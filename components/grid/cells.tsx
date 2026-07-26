@@ -79,7 +79,10 @@ export const TextCell = forwardRef<HTMLInputElement, TextCellProps>(
 
     return (
       <td className={cellTd(sheet)} {...sheetAttrs(sheet)}>
-        <div className="flex items-center h-full">
+        {/* Identifiers stay left-to-right in every locale. A code like
+            HFYC-1201 is split across two elements, so without this the RTL
+            layout mirrors them and it reads 1201-HFYC. */}
+        <div className="flex items-center h-full" dir={mono ? "ltr" : undefined}>
           {prefix && (
             <span className="ps-3 font-mono text-[12.5px] text-pch-ink3 select-none">{prefix}</span>
           )}
@@ -143,9 +146,19 @@ interface DocumentTdProps extends SheetCellProps {
   name: string;
   label: string;
   required?: boolean;
+  readOnly?: boolean;
+  uploaded?: boolean;
 }
 
-export function DocumentTd({ control, name, label, required, ...sheet }: DocumentTdProps) {
+export function DocumentTd({
+  control,
+  name,
+  label,
+  required,
+  readOnly,
+  uploaded,
+  ...sheet
+}: DocumentTdProps) {
   return (
     <td className={cellTd(sheet)} {...sheetAttrs(sheet)}>
       <Controller
@@ -158,6 +171,8 @@ export function DocumentTd({ control, name, label, required, ...sheet }: Documen
             label={label}
             required={required}
             invalid={sheet.invalid}
+            readOnly={readOnly}
+            uploaded={uploaded}
           />
         )}
       />

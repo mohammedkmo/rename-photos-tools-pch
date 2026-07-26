@@ -21,6 +21,7 @@ interface UseSheetOptions {
   ensureRows: (count: number) => void;
   insertRow: (at: number) => void;
   deleteRow: (at: number) => void;
+  onSelectionChange?: (cell: CellRef | null) => void;
 }
 
 const rangeOf = (a: CellRef, b: CellRef): SheetRange => ({
@@ -49,6 +50,7 @@ export function useSheet({
   ensureRows,
   insertRow,
   deleteRow,
+  onSelectionChange,
 }: UseSheetOptions) {
   const lastCol = columnKeys.length - 1;
   const lastRow = Math.max(0, rowCount - 1);
@@ -87,7 +89,8 @@ export function useSheet({
       setFocus(cell);
     }
     setMenu(null);
-  }, [anchor, takeContainerFocus]);
+    onSelectionChange?.(cell);
+  }, [anchor, onSelectionChange, takeContainerFocus]);
 
   const cellHandlers = useCallback((row: number, col: number) => ({
     onMouseDown: (event: React.MouseEvent) => {
@@ -197,8 +200,20 @@ export function useSheet({
         return;
       }
 
+      // Columns are mirrored in Arabic, so the arrow that moves "visually left"
+      // is the one that moves to a higher column index. Follow what the user
+      // sees, the way a spreadsheet does.
+      const rtl =
+        typeof window !== "undefined" &&
+        containerRef.current !== null &&
+        window.getComputedStyle(containerRef.current).direction === "rtl";
+      const forward = rtl ? -1 : 1;
+
       const arrows: Record<string, [number, number]> = {
-        ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
+        ArrowUp: [-1, 0],
+        ArrowDown: [1, 0],
+        ArrowLeft: [0, -forward],
+        ArrowRight: [0, forward],
       };
       const step = arrows[event.key];
       if (!step) return;

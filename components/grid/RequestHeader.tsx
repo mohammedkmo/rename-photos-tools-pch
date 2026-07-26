@@ -37,19 +37,17 @@ const widthFor = (value: string, placeholder: string) =>
  */
 export default function RequestHeader({ title, meta, children }: RequestHeaderProps) {
   return (
-    <div className="flex-none px-6 pt-4 pb-3 bg-pch-surface border-b border-pch-line">
+    <div className="flex-none px-6 pt-4 pb-3 bg-pch-ground border-b border-pch-line">
       <input
         {...title.registration}
         placeholder={title.placeholder}
         aria-invalid={Boolean(title.error) || undefined}
         className={cn(
-          "block w-full max-w-[46rem] -mx-2 px-2 py-1 rounded-md bg-transparent outline-none",
-          "text-[22px] font-semibold tracking-[-0.02em] text-pch-ink",
+          "block w-full max-w-[46rem] ms-1 px-2 py-1 rounded-md bg-transparent outline-none",
+          "text-[28px] font-semibold tracking-[-0.02em] text-pch-ink",
           "placeholder:text-pch-ink3/45 placeholder:font-medium",
-          "hover:bg-pch-subtle focus:bg-white transition-colors",
-          title.error
-            ? "ring-[1.5px] ring-pch-stopEdge"
-            : "focus:ring-[1.5px] focus:ring-pch-accent"
+          " transition-colors",
+          title.error ? "ring-[1.5px] ring-pch-stopEdge" : undefined
         )}
       />
 
@@ -74,6 +72,7 @@ export default function RequestHeader({ title, meta, children }: RequestHeaderPr
             <span className="text-[12px] text-pch-ink3 select-none">{field.label}</span>
             <input
               {...field.registration}
+              dir={field.mono ? "ltr" : undefined}
               placeholder={field.placeholder}
               style={{ width: widthFor(field.value, field.placeholder) }}
               className={cn(

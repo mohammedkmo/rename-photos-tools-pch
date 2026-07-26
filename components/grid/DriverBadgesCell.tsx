@@ -59,6 +59,7 @@ export default function DriverBadgesCell({ value, onChange, invalid }: DriverBad
 
   return (
     <div
+      dir="ltr"
       className={cn(
         "flex items-center gap-1 h-full px-2 overflow-x-auto scrollbar-none",
         invalid && "bg-pch-stopBg/50"

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "PCH Badging Tools",
+    "appName": "Halfaya Badging Office",
     "whatLookingFor": "What are you looking for?",
     "applyingForPersonalBadges": "Applying for Personal Badges",
     "applyingForVehicleBadges": "Applying for Vehicle Badges",
@@ -15,18 +15,13 @@
     "personalBadges": "Personal Badges",
     "vehicleBadges": "Vehicles Badges",
     "continueAnyway": "Continue anyway",
-    "draftFound": "You have unsaved work from {when}.",
-    "draftPhotosNotIncluded": "Photos and documents are not saved and will need to be uploaded again.",
-    "draftRestore": "Restore",
-    "draftDiscard": "Discard",
-    "draftRestored": "Draft restored",
-    "draftRestoredDescription": "Your text entries are back. Please upload the photos and documents again.",
     "fixErrors": "Some details are missing",
     "fixErrorsDescription": "Check the highlighted tabs and fill in the required fields.",
     "generating": "Generating ZIP...",
     "copiedFromPrevious": "Company details copied from the previous entry",
     "willBeWrittenAs": "Will be written as",
-    "appShortName": "Badging"
+    "appShortName": "Badging",
+    "backToApplications": "Back to applications"
   },
   "header": {
     "home": "Home"
@@ -262,6 +257,21 @@
     "fleetNumber": "Fleet number for the vehicle (if applicable)",
     "chassisNumber": "Unique chassis number of the vehicle"
   },
+  "collaboration": {
+    "start": "Collaborate",
+    "startHint": "Start collaboration before uploading media; browser files cannot move into a shared room.",
+    "share": "Copy share link",
+    "copied": "Link copied",
+    "owner": "Owner · media & ZIP",
+    "editor": "Editor · text only",
+    "end": "End collaboration",
+    "leave": "Leave",
+    "endHint": "Close this shared room for everyone",
+    "leaveHint": "Leave this shared room",
+    "endConfirm": "End collaboration for everyone? The shared room will be permanently closed. Text will be saved as a local draft, but uploaded media must be attached again.",
+    "you": "you",
+    "error": "Collaboration is unavailable. Check the Vercel environment variables."
+  },
   "grid": {
     "person": "Person",
     "identity": "Identity",
@@ -327,6 +337,40 @@
     "instructions": "Instructions",
     "clientSideNote": "Nothing leaves your browser — files are built on this device.",
     "allRowsReady": "All rows ready",
-    "rowCount": "{count} rows"
+    "rowCount": "{count, plural, one {# row} other {# rows}}",
+    "ownerOnlyZIP": "Only the sheet owner can generate the ZIP",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "savedTextOnly": "Saved, photos too large"
+  },
+  "documents": {
+    "title": "Your applications",
+    "subtitle": "{count} saved on this device",
+    "newPersonal": "New personal badge application",
+    "newVehicles": "New vehicle badge application",
+    "newPersonalHint": "One row per employee",
+    "newVehiclesHint": "One row per vehicle",
+    "emptyTitle": "No applications yet",
+    "emptyBody": "Start a badge application and it will be kept here on this device, so you can come back and finish it later.",
+    "untitled": "Untitled",
+    "employeeRows": "{count} employees",
+    "vehicleRows": "{count} vehicles",
+    "edited": "Edited {when}",
+    "delete": "Delete application",
+    "confirmDelete": "Delete",
+    "cancel": "Cancel",
+    "storageNote": "Applications are stored in this browser only. Clearing site data removes them.",
+    "subtitleEmpty": "Nothing saved on this device yet",
+    "colName": "Application",
+    "colContractor": "Contractor",
+    "colType": "Type",
+    "colRows": "Rows",
+    "colEdited": "Last edited",
+    "typePersonal": "Personal",
+    "typeVehicles": "Vehicles",
+    "photoShort": "{count} photos",
+    "newShort": "New application",
+    "collabHint": "Share any application and fill the sheet together, live.",
+    "collabHintShort": "Sheets can be filled together, live"
   }
 }

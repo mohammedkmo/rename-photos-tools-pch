@@ -1,12 +1,12 @@
 'use client'
 
-import { Check, Github, Languages } from "lucide-react";
+import { ArrowLeft, Check, Github, Languages } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { HEADER_ACTION_SLOT, HEADER_DOC_SLOT } from "@/components/layout/HeaderPortal";
 
 const LANGUAGES = [
     { code: 'en', name: 'English' },
@@ -24,51 +24,47 @@ export default function Header() {
     const languageHref = (newLocale: string) =>
         `/${newLocale}${pathname.replace(`/${locale}`, '')}`;
 
-    const tabs = [
-        { href: `/${locale}/personal`, label: t('personalBadges') },
-        { href: `/${locale}/vehicles`, label: t('vehicleBadges') },
-    ];
+    // A sheet is an open file, so it gets a way back rather than navigation.
+    const onSheet = pathname !== `/${locale}` && pathname !== `/${locale}/`;
 
     return (
-        <header className="flex-none h-14 flex items-center gap-4 px-4 bg-pch-surface border-b border-pch-line">
-            <Link href={`/${locale}/personal`} className="flex items-center gap-2.5 shrink-0 ps-1">
-                <Image
-                    src="/logo.png"
-                    alt="PetroChina"
-                    width={132}
-                    height={19}
-                    priority
-                    className="h-[17px] w-auto"
-                />
-                <span className="hidden sm:inline text-[13px] font-medium text-pch-ink3 border-s border-pch-line2 ps-2.5">
-                    {t('appShortName')}
-                </span>
-            </Link>
-
-            {/* Segmented control rather than loose links: two modes of one tool */}
-            <nav className="flex items-center gap-0.5 p-[3px] rounded-[10px] bg-pch-subtle border border-pch-line">
-                {tabs.map((tab) => {
-                    const active = pathname === tab.href;
-                    return (
-                        <Link
-                            key={tab.href}
-                            href={tab.href}
-                            aria-current={active ? 'page' : undefined}
-                            className={cn(
-                                "px-3 h-7 flex items-center rounded-[7px] text-[13px] whitespace-nowrap transition-all",
-                                active
-                                    ? "bg-white text-pch-ink font-semibold shadow-[0_1px_2px_rgba(10,37,64,0.10)]"
-                                    : "text-pch-ink3 font-medium hover:text-pch-ink2"
-                            )}
-                        >
-                            {tab.label}
-                        </Link>
-                    );
-                })}
-            </nav>
+        <header className={`flex-none h-14 flex items-center gap-2 px-4  ${onSheet ? 'bg-pch-ground' : 'bg-pch-surface'}`}>
+            {onSheet ? (
+                <>
+                    <Link
+                        href={`/${locale}`}
+                        title={t('backToApplications')}
+                        aria-label={t('backToApplications')}
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-pch-ink2 hover:bg-pch-subtle hover:text-pch-ink transition-colors"
+                    >
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                    </Link>
+                    {/* Document identity: which file is open and whether it is saved. */}
+                    <div id={HEADER_DOC_SLOT} className="flex items-center gap-2 min-w-0" />
+                </>
+            ) : (
+                <Link href={`/${locale}`} className="flex items-center gap-2.5 shrink-0 ps-1">
+                    <Image
+                        src="/logo.png"
+                        alt="PetroChina"
+                        width={132}
+                        height={19}
+                        priority
+                        className="h-[17px] w-auto"
+                    />
+                    <span className="hidden sm:inline text-[13px] font-medium text-pch-ink3 border-s border-pch-line2 ps-2.5">
+                        {t('appName')}
+                    </span>
+                </Link>
+            )}
 
             <div className="ms-auto flex items-center gap-1">
-                <DropdownMenu>
+                {/* Tools that act on the open file: sharing, help. */}
+                <div id={HEADER_ACTION_SLOT} className="flex items-center gap-1" />
+
+                {!onSheet && (
+
+<DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button
                             type="button"
@@ -91,6 +87,10 @@ export default function Header() {
                         ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                )}
+
+                
 
                 <a
                     href="https://github.com/mohammedkmo/hfyc"

@@ -15,18 +15,13 @@
     "personalBadges": "个人证件",
     "vehicleBadges": "车辆证件",
     "continueAnyway": "仍要继续",
-    "draftFound": "您有未保存的内容，保存于 {when}。",
-    "draftPhotosNotIncluded": "照片和文件不会被保存，需要重新上传。",
-    "draftRestore": "恢复",
-    "draftDiscard": "放弃",
-    "draftRestored": "草稿已恢复",
-    "draftRestoredDescription": "文字内容已恢复，请重新上传照片和文件。",
     "fixErrors": "部分信息缺失",
     "fixErrorsDescription": "请检查标记的选项卡并填写必填字段。",
     "generating": "正在生成 ZIP...",
     "copiedFromPrevious": "已从上一条记录复制公司信息",
     "willBeWrittenAs": "将写入为",
-    "appShortName": "证件"
+    "appShortName": "证件",
+    "backToApplications": "返回申请列表"
   },
   "header": {
     "home": "首页"
@@ -253,6 +248,21 @@
     "fleetNumber": "车辆的车队编号（如有）",
     "chassisNumber": "车辆的唯一底盘号"
   },
+  "collaboration": {
+    "start": "协作",
+    "startHint": "请在上传文件前开始协作；浏览器文件无法转移到共享房间。",
+    "share": "复制分享链接",
+    "copied": "链接已复制",
+    "owner": "所有者 · 文件与 ZIP",
+    "editor": "编辑者 · 仅文本",
+    "end": "结束协作",
+    "leave": "离开",
+    "endHint": "为所有人关闭此共享房间",
+    "leaveHint": "离开此共享房间",
+    "endConfirm": "确定为所有人结束协作吗？共享房间将永久关闭。文本会保存为本地草稿，但上传的文件需要重新添加。",
+    "you": "你",
+    "error": "协作功能不可用。请检查 Vercel 环境变量。"
+  },
   "grid": {
     "person": "人员",
     "identity": "身份",
@@ -318,6 +328,40 @@
     "instructions": "使用说明",
     "clientSideNote": "数据不会离开浏览器 — 文件在本机生成。",
     "allRowsReady": "全部行已就绪",
-    "rowCount": "{count} 行"
+    "rowCount": "{count} 行",
+    "ownerOnlyZIP": "只有表格所有者可以生成 ZIP",
+    "saving": "保存中…",
+    "saved": "已保存",
+    "savedTextOnly": "已保存，照片过大"
+  },
+  "documents": {
+    "title": "您的申请",
+    "subtitle": "本设备已保存 {count} 份",
+    "newPersonal": "新建人员证件申请",
+    "newVehicles": "新建车辆证件申请",
+    "newPersonalHint": "每位员工一行",
+    "newVehiclesHint": "每辆车一行",
+    "emptyTitle": "暂无申请",
+    "emptyBody": "创建一份证件申请，它会保存在本设备上，方便您稍后继续填写。",
+    "untitled": "未命名",
+    "employeeRows": "{count} 名员工",
+    "vehicleRows": "{count} 辆车",
+    "edited": "编辑于 {when}",
+    "delete": "删除申请",
+    "confirmDelete": "删除",
+    "cancel": "取消",
+    "storageNote": "申请仅保存在此浏览器中，清除网站数据会将其删除。",
+    "subtitleEmpty": "本设备尚未保存任何内容",
+    "colName": "申请",
+    "colContractor": "承包商",
+    "colType": "类型",
+    "colRows": "行数",
+    "colEdited": "最后编辑",
+    "typePersonal": "人员",
+    "typeVehicles": "车辆",
+    "photoShort": "{count} 张照片",
+    "newShort": "新建申请",
+    "collabHint": "分享任意申请，与同事实时共同填写。",
+    "collabHintShort": "表格支持多人实时填写"
   }
 }
