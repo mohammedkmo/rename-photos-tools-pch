@@ -11,7 +11,8 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { FormValues, EmployeeValues, formSchema } from "@/schema/employee";
 import { nationalities } from "@/data/nationalities";
-import { formatDate, formatExpiryDate } from "@/lib/helpers";
+import { excelDate, excelExpiryDate, formatExpiryDate } from "@/lib/helpers";
+import { applyDateFormat } from "@/lib/excel";
 import { toJpeg } from "@/lib/images";
 import { useDocument } from "@/hooks/use-document";
 import { toast } from "@/hooks/use-toast";
@@ -234,9 +235,9 @@ export default function PersonalBadgeForm({ documentId }: { documentId?: string 
         "First Name": employee.firstName,
         "Last Name": employee.lastName,
         "Department": `HALFAYA/Contractor/${data.contractor}`,
-        "Start Time of Effective Period": formatDate(new Date()),
-        "End Time of Effective Period": formatExpiryDate(employee.securityClearanceExpiryDate),
-        "Enrollment Date": formatDate(new Date()),
+        "Start Time of Effective Period": excelDate(new Date()),
+        "End Time of Effective Period": excelExpiryDate(employee.securityClearanceExpiryDate),
+        "Enrollment Date": excelDate(new Date()),
         "Type": "Basic Person",
         "Company Name": data.contractor,
         "Subcontractor Name": employee.subcontractor,
@@ -276,6 +277,7 @@ export default function PersonalBadgeForm({ documentId }: { documentId?: string 
       const combinedData = [...headerText, headers, ...excelData.map(Object.values)];
       const worksheet = XLSX.utils.aoa_to_sheet(combinedData);
       worksheet["!cols"] = headers.map((header) => ({ wch: header.length + 10 }));
+      applyDateFormat(worksheet, headers, headerText.length + 1);
 
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Register");
